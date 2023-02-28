@@ -9,3 +9,8 @@ import Foundation
 
 print("Hello, World!")
 
+var userInput: String = ""
+
+print("Your name?")
+userInput=readLine()!
+print("User input: \(userInput)")
