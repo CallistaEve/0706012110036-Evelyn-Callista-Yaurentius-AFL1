@@ -7,26 +7,26 @@
 
 import Foundation
 
+//Variabel menyimpan inputan user
 var userInput: String = ""
+
+//Boolean untuk looping program
 var isLoop1:Bool = false
-var nameCheck:Bool = false
 
+//Variabel yang menyimpan data pengguna
 var userName: String = ""
-
 var userInfo = ["userHP" : 100, "userMP" : 50, "userMoney" : 0,"userPotion" : 20,"userElixir" : 20]
 
+//Error handling agar nama tidak menyimpan special input
 let set = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNOPQRSTUVWXYZ ")
+var nameCheck:Bool = false
 
-//var enemy:[String]=["Troll","Golem"]
+//Variabel yang menyimpan data enemy
 var enemyHP = ["Troll":100, "Golem":150]
 var enemyAttack = ["Troll":5, "Golem":10]
 var enemyPrize = ["Troll":20, "Golem":50]
 
-//var enemyHP:Int = enemyHP["Troll"]!
-var Bag = ["Potion":userInfo["userPotion"]!, "Elixir":userInfo["userElixir"]]
-var itemEffect = ["Potion":"Restore 20pt of HP", "Elixir":("Restore 10pt of MP")]
-
-
+//Function untuk mengeprint aksi yang dapat dilakukan user
 func listAction(){
     print("""
     Choose your action:
@@ -41,6 +41,7 @@ func listAction(){
     """)
 }
 
+//Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
 func checkPotion(userHP: Int, userPotion:Int)->String{
     var text: String = ""
     if userPotion == 0{
@@ -48,7 +49,9 @@ func checkPotion(userHP: Int, userPotion:Int)->String{
         You don't have any potion left. Be careful of your next journey.
         Press [return] to go back
         """
-    }else{
+    }
+    // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
+    else{
         text="""
          Your HP is \(userHP).
          You have \(userPotion) potions.
@@ -59,6 +62,7 @@ func checkPotion(userHP: Int, userPotion:Int)->String{
     return text
 }
 
+//Function untuk menghasilkan output berupa teks berdasarkan jumlah elixir yang dimiliki pengguna
 func checkElixir(userMP: Int, userElixir:Int)->String{
     var text: String = ""
     if userElixir == 0{
@@ -66,7 +70,9 @@ func checkElixir(userMP: Int, userElixir:Int)->String{
         You don't have any elixir left. Be careful of your next journey.
         Press [return] to go back
         """
-    }else{
+    }
+    // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan elixir
+    else{
         text="""
          Your MP is \(userMP).
          You have \(userElixir) elixirs.
@@ -77,6 +83,7 @@ func checkElixir(userMP: Int, userElixir:Int)->String{
     return text
 }
 
+//Function untuk menghasilkan text berdasarkan jumlah Mana Point(MP) yang dimiliki pengguna ketika ingin menggunakan Meteor/Shield
 func checkMP(MagicorShield:String, userMP:Int, userName:String)->String{
     var text: String = ""
     if MagicorShield == "m"{
@@ -132,7 +139,7 @@ func checkMP(MagicorShield:String, userMP:Int, userName:String)->String{
     
     return text
 }
-
+//Function untuk menghasilkan text berdasarkan jumlah Health Point(HP) yang dimiliki pengguna untuk menghasilkan output hasil battle
 func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String{
     var text: String = ""
     if enemyHP <= 0{
@@ -150,9 +157,7 @@ func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String
     return text
 }
 
-//func (){
-//
-//}
+//Function untuk menghasilkan teks ketika user memilih opsi lari
 func run(){
     print("""
 You feel that if you don't escape soon, you won't be able to continue the fight.
@@ -455,9 +460,6 @@ repeat {
                                             isLoop3.toggle()
                                         }
                                     }while isLoop3 == false
-                                    
-                                    
-                                    //Opsi 5
                                 }else if userInput == "5"{
                                     repeat{
                                         run()
