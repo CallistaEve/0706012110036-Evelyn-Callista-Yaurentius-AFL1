@@ -10,7 +10,7 @@ import Foundation
 //Variabel menyimpan inputan user
 var userInput: String = ""
 
-//Boolean untuk looping program
+//Boolean untuk looping program menu utama
 var isLoop1:Bool = false
 
 //Variabel yang menyimpan data pengguna
@@ -213,6 +213,7 @@ repeat {
                         
                         if userInput.lowercased() == "c"{
                             isLoop1.toggle()
+                            //Boolean untuk looping program menu kedua
                             var isLoop2:Bool = false
                             repeat{
                                 print("""
@@ -244,6 +245,7 @@ repeat {
                         }
                         
                         else if userInput.lowercased() == "u"{
+                            //Boolean untuk looping program menu ketiga
                             var isLoop3:Bool = false
                             repeat{
                                 print("""
@@ -260,6 +262,7 @@ repeat {
                                 """)
                                 userInput=readLine()!
                                 if userInput == "1" {
+                                    //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
                                         print(checkPotion(userHP: userInfo["userHP"]!, userPotion: userInfo["userPotion"]!))
@@ -281,6 +284,7 @@ repeat {
                                         }
                                     }while isLoop4 == false
                                 }else if userInput == "2"{
+                                    //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
                                         print(checkElixir(userMP: userInfo["userMP"]!, userElixir: userInfo["userElixir"]!))
