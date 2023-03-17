@@ -34,7 +34,7 @@ func listAction(){
         [2] Meteor. User 15pt of MP. Deal 50pt of damage.
         [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
             
-        [4] Use Items
+        [4] Use Potion or Elixir to heal wounds or restore MP
         [5] Flee from battle.
             
         Your choice?
@@ -68,6 +68,7 @@ func checkElixir(userMP: Int, userElixir:Int)->String{
     if userElixir == 0{
         text="""
         You don't have any elixir left. Be careful of your next journey.
+        
         Press [return] to go back
         """
     }
@@ -109,6 +110,8 @@ func checkMP(MagicorShield:String, userMP:Int, userName:String)->String{
             \(userName) use 15pt Mana to deal Meteor against Troll
             It deals 50pt damage to Troll
             Troll deal 5pt to player
+            
+            Press [return] to continue:
             """
         }
     }else if MagicorShield == "s"{
@@ -133,6 +136,8 @@ func checkMP(MagicorShield:String, userMP:Int, userName:String)->String{
             text = """
             \(userName) use 10pt Mana to use shield against Troll
             It blocks an upcoming attack
+            
+            Press [return] to continue:
             """
         }
     }
@@ -145,6 +150,8 @@ func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String
     if enemyHP <= 0{
         text = """
     Congratulations!! You just defeat the \(enemyName)
+
+    Press [return] to continue:
 """
     }else if userHP <= 0{
         text = """
@@ -152,6 +159,8 @@ func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String
     \(userName) ran out of HP!!
     You flee from the battle and went to the hospitals
     \(userName) HP and MP restored
+
+    Press [return] to continue:
 """
     }
     return text
@@ -169,6 +178,15 @@ Press [return] to continue:
 """)
 }
 
+//Function untuk menghasilkan teks ketika user memilih opsi yang tidak tersedia
+func wrongInput(){
+    print("""
+Please Enter The Correct Input
+
+Press [return] to continue:
+""")
+}
+
 repeat {
     print("""
       
@@ -181,9 +199,12 @@ repeat {
     userInput=readLine()!
     if userInput.lowercased() == ""{
         repeat{
-            print("\nMay I know your name, a young wizard?")
+            repeat{
+                print("\nMay I know your name, a young wizard?")
+                
+                userName=readLine()!
+            }while userName == ""
             
-            userName=readLine()!
             do {
                 let regex = try NSRegularExpression(pattern: ".*[^A-Za-z ].*", options: [])
                 if regex.firstMatch(in: userName, options: [], range: NSMakeRange(0, userName.count)) != nil {
@@ -198,7 +219,7 @@ repeat {
                From here, you can...
                
                [C]heck your health and stats
-               [U]se Items
+               [H]eal or Restore Your Wounds with Items
                [B]uy Items
                
                ...or choose where you want to go
@@ -244,7 +265,7 @@ repeat {
                             }while isLoop2 == false
                         }
                         
-                        else if userInput.lowercased() == "u"{
+                        else if userInput.lowercased() == "h"{
                             //Boolean untuk looping program menu ketiga
                             var isLoop3:Bool = false
                             repeat{
@@ -280,6 +301,11 @@ repeat {
                                                 }
                                             }else if userInput.lowercased() == "n"{
                                                 isLoop4.toggle()
+                                            }else{
+                                                repeat{
+                                                    wrongInput()
+                                                    userInput=readLine()!
+                                                }while userInput != ""
                                             }
                                         }
                                     }while isLoop4 == false
@@ -302,11 +328,21 @@ repeat {
                                                 }
                                             }else if userInput.lowercased() == "n"{
                                                 isLoop4.toggle()
+                                            }else{
+                                                repeat{
+                                                    wrongInput()
+                                                    userInput=readLine()!
+                                                }while userInput != ""
                                             }
                                         }
                                     }while isLoop4 == false
                                 }else if userInput == "3"{
                                     isLoop3.toggle()
+                                }else{
+                                    repeat{
+                                        wrongInput()
+                                        userInput=readLine()!
+                                    }while userInput != ""
                                 }
                             }while isLoop3 == false
                         }
@@ -338,6 +374,8 @@ repeat {
                                 \(userName) use Physical Attack to Troll
                                 It deals 5pt to Troll
                                 Troll deal \(enemyAttack)pt to player
+                                
+                                Press [return] to continue:
                                 """)
                                         userInput=readLine()!
                                     }while userInput != ""
@@ -353,6 +391,8 @@ repeat {
                                             repeat{
                                                 print("""
                                         You defeat the Troll, villagers pays \(enemyPrize)$ for your service
+                                        
+                                              Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
@@ -383,6 +423,8 @@ repeat {
                                             repeat{
                                                 print("""
                                         You defeat the Troll, villagers pays \(enemyPrize)$ for your service
+                                        
+                                              Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
@@ -436,6 +478,11 @@ repeat {
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
+                                                    }else{
+                                                        repeat{
+                                                            wrongInput()
+                                                            userInput=readLine()!
+                                                        }while userInput != ""
                                                     }
                                                 }
                                             }while isLoop4 == false
@@ -457,11 +504,21 @@ repeat {
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
+                                                    }else{
+                                                        repeat{
+                                                            wrongInput()
+                                                            userInput=readLine()!
+                                                        }while userInput != ""
                                                     }
                                                 }
                                             }while isLoop4 == false
                                         }else if userInput == "3"{
                                             isLoop3.toggle()
+                                        }else{
+                                            repeat{
+                                                wrongInput()
+                                                userInput=readLine()!
+                                            }while userInput != ""
                                         }
                                     }while isLoop3 == false
                                 }else if userInput == "5"{
@@ -471,6 +528,11 @@ repeat {
                                         if userInput == ""{
                                             isLoop2.toggle()
                                         }
+                                    }while userInput != ""
+                                }else{
+                                    repeat{
+                                        wrongInput()
+                                        userInput=readLine()!
                                     }while userInput != ""
                                 }
                             }while isLoop2 == false
@@ -503,6 +565,8 @@ repeat {
                                 \(userName) use Physical Attack to Golem
                                 It deals 5pt to Golem
                                 Troll deal \(enemyAttack)pt to player
+                                
+                                      Press [return] to continue:
                                 """)
                                         userInput=readLine()!
                                     }while userInput != ""
@@ -518,6 +582,8 @@ repeat {
                                             repeat{
                                                 print("""
                                         You defeat the Golem, villagers pays \(enemyPrize)$ for your service
+                                        
+                                              Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
@@ -548,6 +614,8 @@ repeat {
                                             repeat{
                                                 print("""
                                         You defeat the Golem, villagers pays \(enemyPrize)$ for your service
+                                        
+                                              Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
@@ -600,6 +668,11 @@ repeat {
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
+                                                    }else{
+                                                        repeat{
+                                                            wrongInput()
+                                                            userInput=readLine()!
+                                                        }while userInput != ""
                                                     }
                                                 }
                                             }while isLoop4 == false
@@ -621,11 +694,21 @@ repeat {
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
+                                                    }else{
+                                                        repeat{
+                                                            wrongInput()
+                                                            userInput=readLine()!
+                                                        }while userInput != ""
                                                     }
                                                 }
                                             }while isLoop4 == false
                                         }else if userInput == "3"{
                                             isLoop3.toggle()
+                                        }else{
+                                            repeat{
+                                                wrongInput()
+                                                userInput=readLine()!
+                                            }while userInput != ""
                                         }
                                     }while isLoop3 == false
                                 }else if userInput == "5"{
@@ -635,6 +718,11 @@ repeat {
                                         if userInput == ""{
                                             isLoop2.toggle()
                                         }
+                                    }while userInput != ""
+                                }else{
+                                    repeat{
+                                        wrongInput()
+                                        userInput=readLine()!
                                     }while userInput != ""
                                 }
                             }while isLoop2 == false
@@ -668,26 +756,26 @@ repeat {
                                     if userInfo["userMoney"]! >= 5{
                                         userInfo["userElixir"]! += 1
                                         userInfo["userMoney"]! -= 5
-                                        repeat{
-                                            print("""
-                                            Thanks for your purchase!
-                                            Do you want to buy another item? (y/n)
-                                            """)
-                                            userInput=readLine()!
-                                        }while userInput.lowercased() != "y" && userInput.lowercased() != "n"
-                                        if userInput.lowercased() == "n"{
-                                            print("Come again soon!")
-                                            isLoop2.toggle()
-                                        }
+                                        print("Thanks for your purchase!")
                                     }else{
                                         print("You don't have enough money to buy elixir")
                                     }
                                 }
                                 else if userInput.lowercased() == "l"{
-                                    print("Come again soon!")
+                                    print("Come again soon")
                                     isLoop2.toggle()
+                                }else{
+                                    repeat{
+                                        wrongInput()
+                                        userInput=readLine()!
+                                    }while userInput != ""
                                 }
                             }while isLoop2 == false
+                        }else{
+                            repeat{
+                                wrongInput()
+                                userInput=readLine()!
+                            }while userInput != ""
                         }
                     }while isLoop1 == false;
                 };
