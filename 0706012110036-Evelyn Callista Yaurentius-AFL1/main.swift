@@ -14,20 +14,32 @@ class playerItem {
     var money: Int = 0
     
     init(_ itemName:String, _ description:String ,_ quantity:Int,_ money:Int){
-            self.itemName = itemName
-            self.description = description
-            self.quantity = quantity
-            self.money = money
-        }
+        self.itemName = itemName
+        self.description = description
+        self.quantity = quantity
+        self.money = money
+    }
 }
 
 class elixir: playerItem{
     var mp:Int = 0
     
-    func useElixir(playerName:String)->Int{
-        self.mp = mp+20
+    func useElixir(playerName: String, playerMP: Int)->(quantity: Int, playerMP: Int){
+        var playerMP = playerMP+20
         self.quantity -= 1
         print("\(playerName) use Elixir, Elixir left \(quantity)")
+        return (quantity, playerMP)
+    }
+    func buyElixir(money: Int)->Int{
+        if money > 5{
+            self.quantity += 1
+            self.money -= 5
+        }else{
+            print("You don't have enough money to buy Elixir")
+        }
+        return quantity
+    }
+    func getElixir()->Int{
         return quantity
     }
 }
@@ -35,10 +47,20 @@ class elixir: playerItem{
 class potion: playerItem{
     var hp:Int = 0
     
-    func usePotion(playerName:String)->Int{
+    func usePotion(playerName:String, playerHP:Int)->Int{
         self.hp = hp+20
         self.quantity -= 1
-        print("\(playerName) use Potion, Potion left \(quantity)")
+        print("\(playerName) use \(itemName), \(itemName) left \(quantity)")
+        return quantity
+    }
+    func buyPotion(money: Int)->Int{
+        if money > 5{
+            self.quantity += 1
+            self.money -= 5
+            
+        }else{
+            print("You don't have enough money to buy \(itemName)")
+        }
         return quantity
     }
     
@@ -47,9 +69,61 @@ class potion: playerItem{
     }
 }
 
-let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
-let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
+class playerSkill{
+    var name: String=""
+    var description: String=""
+    var mp: Int=0
+    var damage: Int=0
+    
+    func physicalAttack(){
+        
+    }
+    func meteor(){
+        
+    }
+    func shield(){
+        
+    }
+    func run(){
+        print("""
+    You feel that if you don't escape soon, you won't be able to continue the fight.
+    You look around frantically, searching for a way out. You sprint towards the exit, your heart punding in your chest.
 
+    You're safe, for now.
+    Press [return] to continue:
+
+    """)
+    }
+    
+}
+
+class enemy{
+    var name: String = ""
+    var hp: Int = 0
+    var damage: Int = 0
+    var prize: Int = 0
+    
+    init(_ name:String, _ hp:Int ,_ damage:Int,_ prize:Int){
+        self.name = name
+        self.hp = hp
+        self.damage = damage
+        self.prize = prize
+    }
+    
+    func attack(){
+        
+    }
+    func getName()->String {
+        return name
+    }
+    func getHP()->Int {
+        return hp
+    }
+    func killed()->Int {
+        print("")
+        return prize
+    }
+}
 
 class player{
     var name: String = ""
@@ -57,7 +131,8 @@ class player{
     var mp: Int = 0
     var money: Int = 0
     var playerItem : [playerItem] = []
-
+    var playerSkill : [playerSkill] = []
+    
     init(_ name:String, _ hp:Int ,_ mp:Int,_ money:Int){
         self.name = name
         self.hp = hp
@@ -72,6 +147,13 @@ class player{
     }
     
 }
+
+
+//Inisialisasi Monster dan Item
+let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
+let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
+let thor = enemy("Thor", 100, 5, 20)
+let golem = enemy("Golem", 150, 10, 50)
 
 //Variabel menyimpan inputan user
 var userInput: String = ""
@@ -277,7 +359,8 @@ repeat {
                     print("Must not included number or special character")
                     
                 } else {
-                    print("\nNice to meet you \(userName)!")
+                    let player = player(userName, 100, 50, 0)
+                    print("\nNice to meet you \(player.name)!")
                     
                     repeat {
                         print("""
@@ -305,11 +388,11 @@ repeat {
                             repeat{
                                 print("""
                      
-                     Player name: \(userName)
+                     Player name: \(player.name)
                      
-                     HP:  100 / \(userInfo["userHP"]!)
-                     MP:  50 / \(userInfo["userMP"]!)
-                     Money: \(userInfo["userMoney"]!)$
+                     HP:  100 / \(player.hp)
+                     MP:  50 / \(player.mp)
+                     Money: \(player.money)$
                      
                      Magic:
                      - Physical Attack. No Mana required. Deal 5pt of damage.
