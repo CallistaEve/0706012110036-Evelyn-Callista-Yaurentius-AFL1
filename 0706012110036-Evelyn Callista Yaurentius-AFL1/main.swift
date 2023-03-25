@@ -25,7 +25,7 @@ class elixir: playerItem{
     var mp:Int = 0
     
     func useElixir(playerName: String, playerMP: Int)->(quantity: Int, playerMP: Int){
-        var playerMP = playerMP+20
+        let playerMP = playerMP+20
         self.quantity -= 1
         print("\(playerName) use Elixir, Elixir left \(quantity)")
         return (quantity, playerMP)
@@ -74,6 +74,13 @@ class playerSkill{
     var description: String=""
     var mp: Int=0
     var damage: Int=0
+    
+    init(_ name:String, _ mp:Int ,_ damage:Int,_ description:String){
+        self.name = name
+        self.mp = mp
+        self.damage = damage
+        self.description = description
+    }
     
     func physicalAttack(){
         
@@ -154,6 +161,10 @@ let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
 let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
 let thor = enemy("Thor", 100, 5, 20)
 let golem = enemy("Golem", 150, 10, 50)
+let run = playerSkill("Run", 0, 0, "[5] Flee from battle.")
+let physicalAttack = playerSkill("Physical Attack", 0, 5, "[1] Physical Attack. No mana required. Deal 5pt of damage.")
+let meteor = playerSkill("Meteor", 15, 50, "[2] Meteor. User 15pt of MP. Deal 50pt of damage.")
+let shield = playerSkill("Shield", 10, 0, "[3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.")
 
 //Variabel menyimpan inputan user
 var userInput: String = ""
@@ -315,16 +326,16 @@ func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String
 }
 
 //Function untuk menghasilkan teks ketika user memilih opsi lari
-func run(){
-    print("""
-You feel that if you don't escape soon, you won't be able to continue the fight.
-You look around frantically, searching for a way out. You sprint towards the exit, your heart punding in your chest.
-
-You're safe, for now.
-Press [return] to continue:
-
-""")
-}
+//func run(){
+//    print("""
+//You feel that if you don't escape soon, you won't be able to continue the fight.
+//You look around frantically, searching for a way out. You sprint towards the exit, your heart punding in your chest.
+//
+//You're safe, for now.
+//Press [return] to continue:
+//
+//""")
+//}
 
 //Function untuk menghasilkan teks ketika user memilih opsi yang tidak tersedia
 func wrongInput(){
@@ -672,7 +683,7 @@ repeat {
                                     }while isLoop3 == false
                                 }else if userInput == "5"{
                                     repeat{
-                                        run()
+                                        run.run()
                                         userInput=readLine()!
                                         if userInput == ""{
                                             isLoop2.toggle()
@@ -862,7 +873,7 @@ repeat {
                                     }while isLoop3 == false
                                 }else if userInput == "5"{
                                     repeat{
-                                        run()
+                                        run.run()
                                         userInput=readLine()!
                                         if userInput == ""{
                                             isLoop2.toggle()
