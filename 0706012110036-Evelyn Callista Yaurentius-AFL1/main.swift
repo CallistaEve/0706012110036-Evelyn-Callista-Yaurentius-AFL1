@@ -7,6 +7,72 @@
 
 import Foundation
 
+class playerItem {
+    var itemName: String=""
+    var description: String = ""
+    var quantity: Int = 0
+    var money: Int = 0
+    
+    init(_ itemName:String, _ description:String ,_ quantity:Int,_ money:Int){
+            self.itemName = itemName
+            self.description = description
+            self.quantity = quantity
+            self.money = money
+        }
+}
+
+class elixir: playerItem{
+    var mp:Int = 0
+    
+    func useElixir(playerName:String)->Int{
+        self.mp = mp+20
+        self.quantity -= 1
+        print("\(playerName) use Elixir, Elixir left \(quantity)")
+        return quantity
+    }
+}
+
+class potion: playerItem{
+    var hp:Int = 0
+    
+    func usePotion(playerName:String)->Int{
+        self.hp = hp+20
+        self.quantity -= 1
+        print("\(playerName) use Potion, Potion left \(quantity)")
+        return quantity
+    }
+    
+    func getPotion()->Int{
+        return quantity
+    }
+}
+
+let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
+let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
+
+
+class player{
+    var name: String = ""
+    var hp: Int = 0
+    var mp: Int = 0
+    var money: Int = 0
+    var playerItem : [playerItem] = []
+
+    init(_ name:String, _ hp:Int ,_ mp:Int,_ money:Int){
+        self.name = name
+        self.hp = hp
+        self.mp = mp
+        self.money = money
+    }
+    func getMoney()->Int{
+        return money
+    }
+    func getName()->String {
+        return name
+    }
+    
+}
+
 //Variabel menyimpan inputan user
 var userInput: String = ""
 
