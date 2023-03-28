@@ -39,9 +39,10 @@ class elixir: playerItem{
         }
         return quantity
     }
-    func getElixir()->Int{
-        return quantity
-    }
+//    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
+//        super.init(itemName, description, quantity, money)
+//    }
+    
 }
 
 class potion: playerItem{
@@ -64,9 +65,6 @@ class potion: playerItem{
         return quantity
     }
     
-    func getPotion()->Int{
-        return quantity
-    }
 }
 
 class playerSkill{
@@ -91,14 +89,21 @@ class playerSkill{
     func shield(){
         
     }
+    func attack(_ attackChoice: Int, enemy: String){
+        if attackChoice == 1{
+            
+        }else if attackChoice == 2{
+            
+        }
+    }
     func run(){
         print("""
     You feel that if you don't escape soon, you won't be able to continue the fight.
     You look around frantically, searching for a way out. You sprint towards the exit, your heart punding in your chest.
-
+    
     You're safe, for now.
     Press [return] to continue:
-
+    
     """)
     }
     
@@ -109,22 +114,29 @@ class enemy{
     var hp: Int = 0
     var damage: Int = 0
     var prize: Int = 0
+    var encounterText: String = ""
+    var description: String{
+            return """
+                Name: \(name) x1
+                Health: \(hp)
+                Attack Power: \(damage)\n
+                """
+        }
     
-    init(_ name:String, _ hp:Int ,_ damage:Int,_ prize:Int){
+    init(_ name:String, _ hp:Int ,_ damage:Int,_ prize:Int, _ encounterText: String){
         self.name = name
         self.hp = hp
         self.damage = damage
         self.prize = prize
+        self.encounterText = encounterText
+    }
+    
+    func status(){
+        
     }
     
     func attack(){
         
-    }
-    func getName()->String {
-        return name
-    }
-    func getHP()->Int {
-        return hp
     }
     func killed()->Int {
         print("")
@@ -140,31 +152,58 @@ class player{
     var playerItem : [playerItem] = []
     var playerSkill : [playerSkill] = []
     
-    init(_ name:String, _ hp:Int ,_ mp:Int,_ money:Int){
+    init(_ name:String){
         self.name = name
-        self.hp = hp
-        self.mp = mp
-        self.money = money
+        hp = 100
+        mp = 50
+        money = 0
     }
-    func getMoney()->Int{
-        return money
+    func playerStatus(){
+        print("""
+        
+        Player Name :\(name)
+        Player Health :\(hp)
+        Player Mana :\(mp)
+        Player Money :\(money)
+        
+        """)
     }
-    func getName()->String {
-        return name
+    func listItem(){
+        print("""
+        
+        Your items:
+        [1].Potion = \(userPotion.quantity)
+        [2].Elixir = \(userElixir.quantity)
+        [3].Close the bag
+                                                                                        
+        Which item do you want to use?
+        """)
     }
-    
+    func listAction(){
+        print("""
+        Choose your action:
+            [1] \(physicalAttack.name). \(physicalAttack.description)
+            [2] \(meteor.name). \(meteor.description)
+            [3] \(shield.name). \(shield.description)
+                
+            [4] Use \(userPotion.itemName) or \(userElixir.itemName) to heal wounds or restore MP.
+            [5] \(run.description)
+                
+            Your choice?
+        """)
+    }
 }
 
 
 //Inisialisasi Monster dan Item
 let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
 let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
-let thor = enemy("Thor", 100, 5, 20)
-let golem = enemy("Golem", 150, 10, 50)
-let run = playerSkill("Run", 0, 0, "[5] Flee from battle.")
-let physicalAttack = playerSkill("Physical Attack", 0, 5, "[1] Physical Attack. No mana required. Deal 5pt of damage.")
-let meteor = playerSkill("Meteor", 15, 50, "[2] Meteor. User 15pt of MP. Deal 50pt of damage.")
-let shield = playerSkill("Shield", 10, 0, "[3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.")
+let troll = enemy("Troll", 100, 5, 20, "As you enter the forest, you feel a sense of unease wash over you. \nSuddenly, you hear the sound of twigs snapping behind you. You quickly spin around, and find a Troll emerging from the shadows.")
+let golem = enemy("Golem", 150, 10, 50, "As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin. \nSuddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.")
+let run = playerSkill("Run", 0, 0, "Flee from battle.")
+let physicalAttack = playerSkill("Physical Attack", 0, 5, "Physical Attack. No mana required. Deal 5pt of damage.")
+let meteor = playerSkill("Meteor", 15, 50, "Meteor. Use 15pt of MP. Deal 50pt of damage.")
+let shield = playerSkill("Shield", 10, 0, "Shield. Use 10pt of MP. Block enemy's attack in 1 turn.")
 
 //Variabel menyimpan inputan user
 var userInput: String = ""
@@ -186,19 +225,7 @@ var enemyAttack = ["Troll":5, "Golem":10]
 var enemyPrize = ["Troll":20, "Golem":50]
 
 //Function untuk mengeprint aksi yang dapat dilakukan user
-func listAction(){
-    print("""
-    Choose your action:
-        [1] Physical Attack. No mana required. Deal 5pt of damage.
-        [2] Meteor. User 15pt of MP. Deal 50pt of damage.
-        [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
-            
-        [4] Use Potion or Elixir to heal wounds or restore MP
-        [5] Flee from battle.
-            
-        Your choice?
-    """)
-}
+
 
 //Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
 func checkPotion(userHP: Int, userPotion:Int)->String{
@@ -325,18 +352,6 @@ func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String
     return text
 }
 
-//Function untuk menghasilkan teks ketika user memilih opsi lari
-//func run(){
-//    print("""
-//You feel that if you don't escape soon, you won't be able to continue the fight.
-//You look around frantically, searching for a way out. You sprint towards the exit, your heart punding in your chest.
-//
-//You're safe, for now.
-//Press [return] to continue:
-//
-//""")
-//}
-
 //Function untuk menghasilkan teks ketika user memilih opsi yang tidak tersedia
 func wrongInput(){
     print("""
@@ -370,7 +385,7 @@ repeat {
                     print("Must not included number or special character")
                     
                 } else {
-                    let player = player(userName, 100, 50, 0)
+                    let player = player(userName)
                     print("\nNice to meet you \(player.name)!")
                     
                     repeat {
@@ -405,14 +420,14 @@ repeat {
                      MP:  50 / \(player.mp)
                      Money: \(player.money)$
                      
-                     Magic:
-                     - Physical Attack. No Mana required. Deal 5pt of damage.
-                     - Meteor. Use 15pt of MP. Deal 50pt of damage.
-                     - Shield. Use 10pt of MP. Block enemy's attack in 1 turn
+                     Action:
+                     - \(physicalAttack.name). \(physicalAttack.description).
+                     - \(meteor.name). \(meteor.description).
+                     - \(shield.name). \(shield.description).
                      
                      Items:
-                     - Potion x\(userInfo["userPotion"]!). Heal 20pt of your HP.
-                     - Elixir x\(userInfo["userElixir"]!). Add 10pt of your MP.
+                     - \(userPotion.itemName) x\(userPotion.quantity). \(userPotion.description)
+                     - \(userElixir.itemName) x\(userElixir.quantity). \(userElixir.description).
                      
                      Press [return] to go back:
                      
@@ -430,17 +445,12 @@ repeat {
                             var isLoop3:Bool = false
                             repeat{
                                 print("""
-                                Player Name :\(userName)
-                                Player Health :\(userInfo["userHP"]!)
-                                Player Mana :\(userInfo["userMP"]!)
+                                Player Name :\(player.name)
+                                Player Health :\(player.hp)
+                                Player Mana :\(player.mp)
                                 
-                                Your items:
-                                [1].Potion = \(userInfo["userPotion"]!)
-                                [2].Elixir = \(userInfo["userElixir"]!)
-                                [3].Close the bag
-                                                                        
-                                Which item do you want to use?
                                 """)
+                                player.listItem()
                                 userInput=readLine()!
                                 if userInput == "1" {
                                     //Boolean untuk looping program menu keempat
@@ -512,21 +522,11 @@ repeat {
                             let enemyAttack:Int = enemyAttack["Troll"]!
                             let enemyPrize: Int = enemyPrize["Troll"]!
                             repeat{
-                                print("""
-                     
-                 As you enter the forest, you feel a sense of unease wash over you.
-                 Suddenly, you hear the sound of twigs snapping behind you. You quickly spin around, and find a Troll emerging from the shadows.
-                    
-                 Player Name :\(userName)
-                 Player Health :\(userInfo["userHP"]!)
-                 Player Mana :\(userInfo["userMP"]!)
-                 Player Money :\(userInfo["userMoney"]!)
-                 
-                 Name: Troll x1
-                 Health: \(enemyHP)
-                 Attack Power: \(enemyAttack)\n
-                 """)
-                                listAction()
+                                print(troll.encounterText)
+                                player.playerStatus()
+                                print(troll.description)
+//                                Cek
+                                player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1"{
                                     repeat{
@@ -607,18 +607,9 @@ repeat {
                                 }else if userInput == "4"{
                                     var isLoop3:Bool = false
                                     repeat{
-                                        print("""
-                                        Player Name :\(userName)
-                                        Player Health :\(userInfo["userHP"]!)
-                                        Player Mana :\(userInfo["userMP"]!)
-                                                                        
-                                        Your items:
-                                        [1].Potion = \(userInfo["userPotion"]!)
-                                        [2].Elixir = \(userInfo["userElixir"]!)
-                                        [3].Close the bag
-                                                                                                                
-                                        Which item do you want to use?
-                                        """)
+                                        player.playerStatus()
+                                        player.listItem()
+                                        
                                         userInput=readLine()!
                                         if userInput == "1" {
                                             var isLoop4:Bool = false
@@ -699,32 +690,22 @@ repeat {
                         }
                         else if userInput.lowercased() == "m"{
                             var isLoop2:Bool = false
-                            var enemyHP:Int = enemyHP["Golem"]!
-                            let enemyAttack:Int = enemyAttack["Golem"]!
-                            let enemyPrize: Int = enemyPrize["Golem"]!
+//                            3 baris dibawah kemungkinan dihapus, Cek
+                            var enemyHP:Int = golem.hp
+                            let enemyAttack:Int = golem.damage
+                            let enemyPrize: Int = golem.prize
                             repeat{
-                                print("""
-                     
-                 As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
-                 Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
-                 
-                Player Name :\(userName)
-                Player Health :\(userInfo["userHP"]!)
-                Player Mana :\(userInfo["userMP"]!)
-                Player Money :\(userInfo["userMoney"]!)
-                                  
-                Name: Golem x1
-                Health: \(enemyHP)
-                Attack Power: \(enemyAttack)\n
-                """)
-                                listAction()
+                                print(golem.encounterText)
+                                player.playerStatus()
+                                print(golem.description)
+                                player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1"{
                                     repeat{
                                         print("""
-                                \(userName) use Physical Attack to Golem
+                                \(player.name) use Physical Attack to Golem
                                 It deals 5pt to Golem
-                                Troll deal \(enemyAttack)pt to player
+                                Troll deal \(golem.damage)pt to player
                                 
                                       Press [return] to continue:
                                 """)
@@ -802,13 +783,8 @@ repeat {
                                         Player Health :\(userInfo["userHP"]!)
                                         Player Mana :\(userInfo["userMP"]!)
                                                                         
-                                        Your items:
-                                        [1].Potion = \(userInfo["userPotion"]!)
-                                        [2].Elixir = \(userInfo["userElixir"]!)
-                                        [3].Close the bag
-                                                                                                                
-                                        Which item do you want to use?
                                         """)
+                                        player.listItem()
                                         userInput=readLine()!
                                         if userInput == "1" {
                                             var isLoop4:Bool = false
