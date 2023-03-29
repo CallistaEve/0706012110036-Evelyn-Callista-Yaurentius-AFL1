@@ -524,20 +524,26 @@ repeat {
                                 }
                             }while isLoop3 == false
                         }
-                        else if userInput.lowercased() == "f"{
+                        else if userInput.lowercased() == "f" || userInput.lowercased() == "m"{
                             var isLoop2:Bool = false
-                            var enemyHP:Int = enemyHP["Troll"]!
-                            let enemyAttack:Int = enemyAttack["Troll"]!
-                            let enemyPrize: Int = enemyPrize["Troll"]!
+                            var enemyType = troll
+                            if userInput.lowercased() == "f"{
+                                enemyType = troll
+                            }else if userInput.lowercased() == "m"{
+                                enemyType = golem
+                            }
+                            var enemyHP:Int = enemyType.hp
+                            let enemyAttack:Int = enemyType.damage
+                            let enemyPrize: Int = enemyType.prize
                             repeat{
-                                print(troll.encounterText)
+//                                var enemyNametest = troll
+                                print(enemyType.encounterText)
                                 player.playerStatus()
                                 print(troll.description)
                                 //                                Cek
                                 player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1"{
-//                                    func attack(attackChoice: Int, playerName: String, playerDamage: Int, enemy: String)
                                     repeat{
                                         var reduceEnemyHP = physicalAttack.attack(skillName: physicalAttack.name, playerName: player.name, playerDamage: physicalAttack.damage, enemy: troll.name, enemyHP: troll.hp)
                                         troll.getAttacked(hpLeft: reduceEnemyHP)
@@ -545,28 +551,28 @@ repeat {
                                         player.getAttacked(hpLeft: reducePlayerHP)
                                         userInput=readLine()!
                                     }while userInput != ""
-                                    userInfo["userHP"]! -= enemyAttack
-                                    enemyHP -= 5
-                                    if enemyHP <= 0 || userInfo["userHP"]! <= 0{
+//                                    userInfo["userHP"]! -= enemyAttack
+//                                    enemyHP -= 5
+                                    if troll.hp <= 0 || player.hp <= 0{
                                         repeat{
-                                            print(checkHP(enemyName:"Troll",userName: userName, userHP: userInfo["userHP"]!, enemyHP: enemyHP))
+                                            print(checkHP(enemyName:troll.name,userName: player.name, userHP: player.hp, enemyHP: troll.hp))
                                             userInput=readLine()!
                                         }while userInput != ""
                                         isLoop2.toggle()
-                                        if enemyHP <= 0{
+                                        if troll.hp <= 0{
                                             repeat{
                                                 print("""
-                                        You defeat the Troll, villagers pays \(enemyPrize)$ for your service
+                                        You defeat the Troll, villagers pays \(troll.prize)$ for your service
                                         
                                               Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
-                                            userInfo["userMoney"]! += enemyPrize
+                                            player.money += troll.prize
                                         }
-                                        if userInfo["userHP"]! == 0 {
-                                            userInfo["userHP"]! = 100
-                                            userInfo["userMP"]! = 50
+                                        if player.hp == 0 {
+                                            player.hp = 100
+                                            player.mp = 50
                                         }
                                     }
                                 }else if userInput == "2"{
@@ -574,7 +580,7 @@ repeat {
                                         print(checkMP(MagicorShield: "m",userMP: userInfo["userMP"]!, userName: userName))
                                         userInput=readLine()!
                                         if userInfo["userMP"]! > 15 {
-                                            userInfo["userHP"]! -= enemyAttack
+                                            player.hp -= enemyAttack
                                             userInfo["userMP"]! -= 15
                                             enemyHP -= 50
                                         }
