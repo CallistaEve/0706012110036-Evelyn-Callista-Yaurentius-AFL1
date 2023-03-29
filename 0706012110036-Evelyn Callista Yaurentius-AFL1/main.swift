@@ -39,9 +39,9 @@ class elixir: playerItem{
         }
         return quantity
     }
-//    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
-//        super.init(itemName, description, quantity, money)
-//    }
+    //    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
+    //        super.init(itemName, description, quantity, money)
+    //    }
     
 }
 
@@ -89,12 +89,13 @@ class playerSkill{
     func shield(){
         
     }
-    func attack(_ attackChoice: Int, enemy: String){
-        if attackChoice == 1{
-            
-        }else if attackChoice == 2{
-            
-        }
+    func attack(skillName: String, playerName: String, playerDamage: Int, enemy: String, enemyHP: Int)->Int{
+        print("""
+    \(playerName) use \(skillName) to \(enemy)
+    It deals \(playerDamage)pt to \(enemy)
+    """)
+        var hpLeft = enemyHP - playerDamage
+        return hpLeft
     }
     func run(){
         print("""
@@ -116,12 +117,12 @@ class enemy{
     var prize: Int = 0
     var encounterText: String = ""
     var description: String{
-            return """
+        return """
                 Name: \(name) x1
                 Health: \(hp)
                 Attack Power: \(damage)\n
                 """
-        }
+    }
     
     init(_ name:String, _ hp:Int ,_ damage:Int,_ prize:Int, _ encounterText: String){
         self.name = name
@@ -135,8 +136,17 @@ class enemy{
         
     }
     
-    func attack(){
-        
+    func attack(playerHP: Int)->Int{
+        print("""
+    \(name) deal \(damage)pt to player
+
+    Press [return] to continue:
+    """)
+        var hpLeft = playerHP - damage
+        return hpLeft
+    }
+    func getAttacked(hpLeft: Int){
+        self.hp = hpLeft
     }
     func killed()->Int {
         print("")
@@ -157,6 +167,9 @@ class player{
         hp = 100
         mp = 50
         money = 0
+    }
+    func getAttacked(hpLeft: Int){
+        self.hp = hpLeft
     }
     func playerStatus(){
         print("""
@@ -444,12 +457,7 @@ repeat {
                             //Boolean untuk looping program menu ketiga
                             var isLoop3:Bool = false
                             repeat{
-                                print("""
-                                Player Name :\(player.name)
-                                Player Health :\(player.hp)
-                                Player Mana :\(player.mp)
-                                
-                                """)
+                                player.playerStatus()
                                 player.listItem()
                                 userInput=readLine()!
                                 if userInput == "1" {
@@ -525,18 +533,16 @@ repeat {
                                 print(troll.encounterText)
                                 player.playerStatus()
                                 print(troll.description)
-//                                Cek
+                                //                                Cek
                                 player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1"{
+//                                    func attack(attackChoice: Int, playerName: String, playerDamage: Int, enemy: String)
                                     repeat{
-                                        print("""
-                                \(userName) use Physical Attack to Troll
-                                It deals 5pt to Troll
-                                Troll deal \(enemyAttack)pt to player
-                                
-                                Press [return] to continue:
-                                """)
+                                        var reduceEnemyHP = physicalAttack.attack(skillName: physicalAttack.name, playerName: player.name, playerDamage: physicalAttack.damage, enemy: troll.name, enemyHP: troll.hp)
+                                        troll.getAttacked(hpLeft: reduceEnemyHP)
+                                        var reducePlayerHP = troll.attack(playerHP: player.hp)
+                                        player.getAttacked(hpLeft: reducePlayerHP)
                                         userInput=readLine()!
                                     }while userInput != ""
                                     userInfo["userHP"]! -= enemyAttack
@@ -690,7 +696,7 @@ repeat {
                         }
                         else if userInput.lowercased() == "m"{
                             var isLoop2:Bool = false
-//                            3 baris dibawah kemungkinan dihapus, Cek
+                            //                            3 baris dibawah kemungkinan dihapus, Cek
                             var enemyHP:Int = golem.hp
                             let enemyAttack:Int = golem.damage
                             let enemyPrize: Int = golem.prize
@@ -778,12 +784,7 @@ repeat {
                                 }else if userInput == "4"{
                                     var isLoop3:Bool = false
                                     repeat{
-                                        print("""
-                                        Player Name :\(userName)
-                                        Player Health :\(userInfo["userHP"]!)
-                                        Player Mana :\(userInfo["userMP"]!)
-                                                                        
-                                        """)
+                                        player.playerStatus()
                                         player.listItem()
                                         userInput=readLine()!
                                         if userInput == "1" {
