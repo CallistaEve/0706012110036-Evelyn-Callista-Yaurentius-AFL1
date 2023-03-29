@@ -42,6 +42,27 @@ class elixir: playerItem{
     //    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
     //        super.init(itemName, description, quantity, money)
     //    }
+    //Function untuk menghasilkan output berupa teks berdasarkan jumlah elixir yang dimiliki pengguna
+    func checkElixir(userMP: Int, userElixir:Int)->String{
+        var text: String = ""
+        if userElixir == 0{
+            text="""
+            You don't have any elixir left. Be careful of your next journey.
+            
+            Press [return] to go back
+            """
+        }
+        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan elixir
+        else{
+            text="""
+             Your MP is \(userMP).
+             You have \(userElixir) elixirs.
+             
+             Are you sure want to use 1 elixir to restore mana? [Y/N]
+             """
+        }
+        return text
+    }
     
 }
 
@@ -64,6 +85,26 @@ class potion: playerItem{
         }
         return quantity
     }
+    //Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
+    func checkPotion(userHP: Int, userPotion:Int)->String{
+        var text: String = ""
+        if userPotion == 0{
+            text="""
+            You don't have any potion left. Be careful of your next journey.
+            Press [return] to go back
+            """
+        }
+        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
+        else{
+            text="""
+             Your HP is \(userHP).
+             You have \(userPotion) potions.
+             
+             Are you sure want to use 1 potion to heal wound? [Y/N]
+             """
+        }
+        return text
+    }
     
 }
 
@@ -80,23 +121,50 @@ class playerSkill{
         self.description = description
     }
     
-    func physicalAttack(){
-        
-    }
-    func meteor(){
-        
-    }
-    func shield(){
-        
-    }
-    func attack(skillName: String, playerName: String, playerDamage: Int, enemy: String, enemyHP: Int)->Int{
-        print("""
-    \(playerName) use \(skillName) to \(enemy)
-    It deals \(playerDamage)pt to \(enemy)
-    """)
-        var hpLeft = enemyHP - playerDamage
-        return hpLeft
-    }
+    func attack(skillName: String, playerName: String, playerMp: Int, playerDamage: Int, enemy: String, enemyHP: Int)->(hpLeft: Int, mpLeft: Int, move: Int){
+        var hpLeft: Int = enemyHP
+        var mpLeft: Int = playerMp
+        var move: Int = 1
+        if skillName == "Meteor" || skillName == "Shield"{
+            if playerMp <= 0{
+                move = 0
+                print ("""
+                    You ran out of Mana, can't use \(skillName)
+                    Use Elixir to restore Mana
+                    
+                    Press [return] to go back:
+        """)
+                return (hpLeft, mpLeft, move)
+            }else if playerMp < mp{
+                move = 0
+                print  ("""
+            Your current mana : \(playerMp)
+            Your Mana doesn't enough to cast \(skillName)
+            Use Elixir to restore Mana
+            
+            Press [return] to go back:
+            """
+                        )
+                return (hpLeft, mpLeft, move)
+            }
+        }
+        if skillName == "Shield"{
+            print("""
+            \(playerName) use \(mp)pt Mana to use \(skillName) against \(enemy)
+            It blocks an upcoming attack
+            
+            Press [return] to continue:
+            """)
+        }else{
+            print("""
+        \(playerName) use \(skillName) to \(enemy)
+        It deals \(playerDamage)pt to \(enemy)
+        """)
+        }
+        hpLeft = enemyHP - playerDamage
+        mpLeft = playerMp - mp
+        return (hpLeft, mpLeft, move)
+}
     func run(){
         print("""
     You feel that if you don't escape soon, you won't be able to continue the fight.
@@ -132,17 +200,13 @@ class enemy{
         self.encounterText = encounterText
     }
     
-    func status(){
-        
-    }
-    
     func attack(playerHP: Int)->Int{
         print("""
     \(name) deal \(damage)pt to player
-
+    
     Press [return] to continue:
     """)
-        var hpLeft = playerHP - damage
+        let hpLeft = playerHP - damage
         return hpLeft
     }
     func getAttacked(hpLeft: Int){
@@ -168,9 +232,6 @@ class player{
         mp = 50
         money = 0
     }
-    func getAttacked(hpLeft: Int){
-        self.hp = hpLeft
-    }
     func playerStatus(){
         print("""
         
@@ -195,9 +256,9 @@ class player{
     func listAction(){
         print("""
         Choose your action:
-            [1] \(physicalAttack.name). \(physicalAttack.description)
-            [2] \(meteor.name). \(meteor.description)
-            [3] \(shield.name). \(shield.description)
+            [1] \(physicalAttack.description)
+            [2] \(meteor.description)
+            [3] \(shield.description)
                 
             [4] Use \(userPotion.itemName) or \(userElixir.itemName) to heal wounds or restore MP.
             [5] \(run.description)
@@ -211,8 +272,7 @@ class player{
 //Inisialisasi Monster dan Item
 let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
 let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
-let troll = enemy("Troll", 100, 5, 20, "As you enter the forest, you feel a sense of unease wash over you. \nSuddenly, you hear the sound of twigs snapping behind you. You quickly spin around, and find a Troll emerging from the shadows.")
-let golem = enemy("Golem", 150, 10, 50, "As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin. \nSuddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.")
+
 let run = playerSkill("Run", 0, 0, "Flee from battle.")
 let physicalAttack = playerSkill("Physical Attack", 0, 5, "Physical Attack. No mana required. Deal 5pt of damage.")
 let meteor = playerSkill("Meteor", 15, 50, "Meteor. Use 15pt of MP. Deal 50pt of damage.")
@@ -224,125 +284,10 @@ var userInput: String = ""
 //Boolean untuk looping program menu utama
 var isLoop1:Bool = false
 
-//Variabel yang menyimpan data pengguna
-var userName: String = ""
-var userInfo = ["userHP" : 100, "userMP" : 50, "userMoney" : 0,"userPotion" : 20,"userElixir" : 20]
-
 //Error handling agar nama tidak menyimpan special input
 let set = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNOPQRSTUVWXYZ ")
 var nameCheck:Bool = false
 
-//Variabel yang menyimpan data enemy
-var enemyHP = ["Troll":100, "Golem":150]
-var enemyAttack = ["Troll":5, "Golem":10]
-var enemyPrize = ["Troll":20, "Golem":50]
-
-//Function untuk mengeprint aksi yang dapat dilakukan user
-
-
-//Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
-func checkPotion(userHP: Int, userPotion:Int)->String{
-    var text: String = ""
-    if userPotion == 0{
-        text="""
-        You don't have any potion left. Be careful of your next journey.
-        Press [return] to go back
-        """
-    }
-    // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
-    else{
-        text="""
-         Your HP is \(userHP).
-         You have \(userPotion) potions.
-         
-         Are you sure want to use 1 potion to heal wound? [Y/N]
-         """
-    }
-    return text
-}
-
-//Function untuk menghasilkan output berupa teks berdasarkan jumlah elixir yang dimiliki pengguna
-func checkElixir(userMP: Int, userElixir:Int)->String{
-    var text: String = ""
-    if userElixir == 0{
-        text="""
-        You don't have any elixir left. Be careful of your next journey.
-        
-        Press [return] to go back
-        """
-    }
-    // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan elixir
-    else{
-        text="""
-         Your MP is \(userMP).
-         You have \(userElixir) elixirs.
-         
-         Are you sure want to use 1 elixir to restore mana? [Y/N]
-         """
-    }
-    return text
-}
-
-//Function untuk menghasilkan text berdasarkan jumlah Mana Point(MP) yang dimiliki pengguna ketika ingin menggunakan Meteor/Shield
-func checkMP(MagicorShield:String, userMP:Int, userName:String)->String{
-    var text: String = ""
-    if MagicorShield == "m"{
-        if userMP == 0{
-            text = """
-            You ran out of Mana, can't use magic
-            Use Elixir to restore Mana
-            
-            Press [return] to go back:
-            """
-        }
-        else if userMP < 15 && userMP > 0{
-            text = """
-            Your current mana : \(userMP)
-            Your Mana doesn't enough to cast Meteor
-            Use Elixir to restore Mana
-            
-            Press [return] to go back:
-            """
-        }
-        else if userMP > 15{
-            text = """
-            \(userName) use 15pt Mana to deal Meteor against Troll
-            It deals 50pt damage to Troll
-            Troll deal 5pt to player
-            
-            Press [return] to continue:
-            """
-        }
-    }else if MagicorShield == "s"{
-        if userMP == 0{
-            text = """
-            You ran out of Mana, can't use shield
-            Use Elixir to restore Mana
-            
-            Press [return] to go back:
-            """
-        }
-        else if userMP < 15 && userMP > 0{
-            text = """
-            Your current mana : \(userMP)
-            Your Mana doesn't enough to use shield
-            Use Elixir to restore Mana
-            
-            Press [return] to go back:
-            """
-        }
-        else if userMP > 10{
-            text = """
-            \(userName) use 10pt Mana to use shield against Troll
-            It blocks an upcoming attack
-            
-            Press [return] to continue:
-            """
-        }
-    }
-    
-    return text
-}
 //Function untuk menghasilkan text berdasarkan jumlah Health Point(HP) yang dimiliki pengguna untuk menghasilkan output hasil battle
 func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String{
     var text: String = ""
@@ -375,6 +320,8 @@ Press [return] to continue:
 }
 
 repeat {
+    //Variabel yang menyimpan data pengguna
+    var userName: String = ""
     print("""
       
       Welcome to the world of magic!
@@ -464,18 +411,18 @@ repeat {
                                     //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
-                                        print(checkPotion(userHP: userInfo["userHP"]!, userPotion: userInfo["userPotion"]!))
+                                        print(userPotion.checkPotion(userHP: player.hp, userPotion: userPotion.quantity))
                                         userInput=readLine()!
-                                        if userInfo["userPotion"]! == 0{
+                                        if userPotion.quantity == 0{
                                             if userInput == ""{
                                                 isLoop4.toggle()
                                             }
-                                        }else if userInfo["userPotion"]! > 0{
+                                        }else if userPotion.quantity > 0{
                                             if userInput.lowercased() == "y" {
-                                                userInfo["userPotion"]! -= 1
-                                                userInfo["userHP"]! += 20
-                                                if userInfo["userHP"]! > 100{
-                                                    userInfo["userHP"]! = 100
+                                                userPotion.quantity -= 1
+                                                player.hp += 20
+                                                if player.hp > 100{
+                                                    player.hp = 100
                                                 }
                                             }else if userInput.lowercased() == "n"{
                                                 isLoop4.toggle()
@@ -491,18 +438,18 @@ repeat {
                                     //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
-                                        print(checkElixir(userMP: userInfo["userMP"]!, userElixir: userInfo["userElixir"]!))
+                                        print(userElixir.checkElixir(userMP: player.mp, userElixir: userElixir.quantity))
                                         userInput=readLine()!
-                                        if userInfo["userElixir"]! == 0{
+                                        if userElixir.quantity == 0{
                                             if userInput == ""{
                                                 isLoop4.toggle()
                                             }
-                                        }else if userInfo["userElixir"]! > 0{
+                                        }else if userElixir.quantity > 0{
                                             if userInput.lowercased() == "y" {
-                                                userInfo["userElixir"]! -= 1
-                                                userInfo["userMP"]! += 10
-                                                if userInfo["userMP"]! > 50{
-                                                    userInfo["userMP"]! = 50
+                                                userElixir.quantity -= 1
+                                                player.mp += 10
+                                                if player.mp > 50{
+                                                    player.mp = 50
                                                 }
                                             }else if userInput.lowercased() == "n"{
                                                 isLoop4.toggle()
@@ -526,97 +473,66 @@ repeat {
                         }
                         else if userInput.lowercased() == "f" || userInput.lowercased() == "m"{
                             var isLoop2:Bool = false
+                            
+                            //                            Inisialisasi Enemy
+                            let troll = enemy("Troll", 100, 5, 20, "As you enter the forest, you feel a sense of unease wash over you. \nSuddenly, you hear the sound of twigs snapping behind you. You quickly spin around, and find a Troll emerging from the shadows.")
+                            let golem = enemy("Golem", 150, 10, 50, "As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin. \nSuddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.")
+                            
                             var enemyType = troll
                             if userInput.lowercased() == "f"{
                                 enemyType = troll
                             }else if userInput.lowercased() == "m"{
                                 enemyType = golem
                             }
-                            var enemyHP:Int = enemyType.hp
-                            let enemyAttack:Int = enemyType.damage
-                            let enemyPrize: Int = enemyType.prize
+                            print(enemyType.encounterText)
                             repeat{
-//                                var enemyNametest = troll
-                                print(enemyType.encounterText)
                                 player.playerStatus()
-                                print(troll.description)
+                                print(enemyType.description)
                                 //                                Cek
                                 player.listAction()
                                 userInput=readLine()!
-                                if userInput == "1"{
+                                if userInput == "1" || userInput == "2" || userInput == "3"{
+                                    var choosenAction = physicalAttack
+                                    if userInput.lowercased() == "1"{
+                                        choosenAction = physicalAttack
+                                    }else if userInput.lowercased() == "2"{
+                                        choosenAction = meteor
+                                    }else if userInput.lowercased() == "3"{
+                                        choosenAction = shield
+                                    }
                                     repeat{
-                                        var reduceEnemyHP = physicalAttack.attack(skillName: physicalAttack.name, playerName: player.name, playerDamage: physicalAttack.damage, enemy: troll.name, enemyHP: troll.hp)
-                                        troll.getAttacked(hpLeft: reduceEnemyHP)
-                                        var reducePlayerHP = troll.attack(playerHP: player.hp)
-                                        player.getAttacked(hpLeft: reducePlayerHP)
+                                        let hasil = choosenAction.attack(skillName: choosenAction.name, playerName: player.name, playerMp: player.mp, playerDamage: choosenAction.damage, enemy: enemyType.name, enemyHP: enemyType.hp)
+                                        player.mp = hasil.mpLeft
+                                        enemyType.getAttacked(hpLeft: hasil.hpLeft)
+                                        if hasil.move == 1{
+                                            player.hp -= enemyType.damage
+                                        }
                                         userInput=readLine()!
                                     }while userInput != ""
-//                                    userInfo["userHP"]! -= enemyAttack
-//                                    enemyHP -= 5
-                                    if troll.hp <= 0 || player.hp <= 0{
+                                    if enemyType.hp <= 0 || player.hp <= 0{
                                         repeat{
-                                            print(checkHP(enemyName:troll.name,userName: player.name, userHP: player.hp, enemyHP: troll.hp))
+                                            print(checkHP(enemyName:enemyType.name,userName: player.name, userHP: player.hp, enemyHP: enemyType.hp))
                                             userInput=readLine()!
                                         }while userInput != ""
                                         isLoop2.toggle()
-                                        if troll.hp <= 0{
+                                        if enemyType.hp <= 0{
                                             repeat{
                                                 print("""
-                                        You defeat the Troll, villagers pays \(troll.prize)$ for your service
+                                        You defeat the \(enemyType.name), villagers pays \(enemyType.prize)$ for your service
                                         
                                               Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
-                                            player.money += troll.prize
+                                            player.money += enemyType.prize
                                         }
                                         if player.hp == 0 {
                                             player.hp = 100
                                             player.mp = 50
                                         }
                                     }
-                                }else if userInput == "2"{
-                                    repeat{
-                                        print(checkMP(MagicorShield: "m",userMP: userInfo["userMP"]!, userName: userName))
-                                        userInput=readLine()!
-                                        if userInfo["userMP"]! > 15 {
-                                            player.hp -= enemyAttack
-                                            userInfo["userMP"]! -= 15
-                                            enemyHP -= 50
-                                        }
-                                    }while userInput != ""
-                                    if enemyHP <= 0 || userInfo["userHP"]! <= 0{
-                                        repeat{
-                                            print(checkHP(enemyName:"Troll", userName: userName, userHP: userInfo["userHP"]!, enemyHP: enemyHP))
-                                            userInput=readLine()!
-                                        }while userInput != ""
-                                        isLoop2.toggle()
-                                        if enemyHP <= 0{
-                                            repeat{
-                                                print("""
-                                        You defeat the Troll, villagers pays \(enemyPrize)$ for your service
-                                        
-                                              Press [return] to continue:
-                                        """)
-                                                userInput=readLine()!
-                                            }while userInput != ""
-                                            userInfo["userMoney"]! += enemyPrize
-                                        }
-                                        if userInfo["userHP"]! == 0 {
-                                            userInfo["userHP"]! = 100
-                                            userInfo["userMP"]! = 50
-                                        }
-                                    }
-                                }else if userInput == "3"{
-                                    repeat{
-                                        print(checkMP(MagicorShield: "s",userMP: userInfo["userMP"]!, userName: userName))
-                                        userInput=readLine()!
-                                    }while userInput != ""
-                                    if userInfo["userMP"]! > 10 {
-                                        userInfo["userMP"]! -= 10
-                                    }
-                                    
-                                }else if userInput == "4"{
+                                }
+                                else if userInput == "4"{
                                     var isLoop3:Bool = false
                                     repeat{
                                         player.playerStatus()
@@ -626,18 +542,18 @@ repeat {
                                         if userInput == "1" {
                                             var isLoop4:Bool = false
                                             repeat{
-                                                print(checkPotion(userHP: userInfo["userHP"]!, userPotion: userInfo["userPotion"]!))
+                                                print(userPotion.checkPotion(userHP: player.hp, userPotion: userPotion.quantity))
                                                 userInput=readLine()!
-                                                if userInfo["userPotion"]! == 0{
+                                                if userPotion.quantity == 0{
                                                     if userInput == ""{
                                                         isLoop4.toggle()
                                                     }
-                                                }else if userInfo["userPotion"]! > 0{
+                                                }else if userPotion.quantity > 0{
                                                     if userInput.lowercased() == "y" {
-                                                        userInfo["userPotion"]! -= 1
-                                                        userInfo["userHP"]! += 20
-                                                        if userInfo["userHP"]! > 100{
-                                                            userInfo["userHP"]! = 100
+                                                        userPotion.quantity -= 1
+                                                        player.hp += 20
+                                                        if player.hp > 100{
+                                                            player.hp = 100
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
@@ -652,18 +568,18 @@ repeat {
                                         }else if userInput == "2"{
                                             var isLoop4:Bool = false
                                             repeat{
-                                                print(checkElixir(userMP: userInfo["userMP"]!, userElixir: userInfo["userElixir"]!))
+                                                print(userElixir.checkElixir(userMP: player.mp, userElixir: userElixir.quantity))
                                                 userInput=readLine()!
-                                                if userInfo["userElixir"]! == 0{
+                                                if userElixir.quantity == 0{
                                                     if userInput == ""{
                                                         isLoop4.toggle()
                                                     }
-                                                }else if userInfo["userElixir"]! > 0{
+                                                }else if userElixir.quantity > 0{
                                                     if userInput.lowercased() == "y" {
-                                                        userInfo["userElixir"]! -= 1
-                                                        userInfo["userMP"]! += 20
-                                                        if userInfo["userMP"]! > 50{
-                                                            userInfo["userMP"]! = 50
+                                                        userElixir.quantity -= 1
+                                                        player.mp += 20
+                                                        if player.mp > 50{
+                                                            player.mp = 50
                                                         }
                                                     }else if userInput.lowercased() == "n"{
                                                         isLoop4.toggle()
@@ -699,177 +615,7 @@ repeat {
                                     }while userInput != ""
                                 }
                             }while isLoop2 == false
-                        }
-                        else if userInput.lowercased() == "m"{
-                            var isLoop2:Bool = false
-                            //                            3 baris dibawah kemungkinan dihapus, Cek
-                            var enemyHP:Int = golem.hp
-                            let enemyAttack:Int = golem.damage
-                            let enemyPrize: Int = golem.prize
-                            repeat{
-                                print(golem.encounterText)
-                                player.playerStatus()
-                                print(golem.description)
-                                player.listAction()
-                                userInput=readLine()!
-                                if userInput == "1"{
-                                    repeat{
-                                        print("""
-                                \(player.name) use Physical Attack to Golem
-                                It deals 5pt to Golem
-                                Troll deal \(golem.damage)pt to player
-                                
-                                      Press [return] to continue:
-                                """)
-                                        userInput=readLine()!
-                                    }while userInput != ""
-                                    userInfo["userHP"]! -= enemyAttack
-                                    enemyHP -= 5
-                                    if enemyHP <= 0 || userInfo["userHP"]! <= 0{
-                                        repeat{
-                                            print(checkHP(enemyName:"Golem", userName: userName, userHP: userInfo["userHP"]!, enemyHP: enemyHP))
-                                            userInput=readLine()!
-                                        }while userInput != ""
-                                        isLoop2.toggle()
-                                        if enemyHP <= 0{
-                                            repeat{
-                                                print("""
-                                        You defeat the Golem, villagers pays \(enemyPrize)$ for your service
-                                        
-                                              Press [return] to continue:
-                                        """)
-                                                userInput=readLine()!
-                                            }while userInput != ""
-                                            userInfo["userMoney"]! += 20
-                                        }
-                                        if userInfo["userHP"]! == 0 {
-                                            userInfo["userHP"]! = 100
-                                            userInfo["userMP"]! = 50
-                                        }
                                     }
-                                }else if userInput == "2"{
-                                    repeat{
-                                        print(checkMP(MagicorShield: "m",userMP: userInfo["userMP"]!, userName: userName))
-                                        userInput=readLine()!
-                                        if userInfo["userMP"]! > 15 {
-                                            userInfo["userHP"]! -= enemyAttack
-                                            userInfo["userMP"]! -= 15
-                                            enemyHP -= 50
-                                        }
-                                    }while userInput != ""
-                                    if enemyHP <= 0 || userInfo["userHP"]! <= 0{
-                                        repeat{
-                                            print(checkHP(enemyName:"Golem", userName: userName, userHP: userInfo["userHP"]!, enemyHP: enemyHP))
-                                            userInput=readLine()!
-                                        }while userInput != ""
-                                        isLoop2.toggle()
-                                        if enemyHP <= 0{
-                                            repeat{
-                                                print("""
-                                        You defeat the Golem, villagers pays \(enemyPrize)$ for your service
-                                        
-                                              Press [return] to continue:
-                                        """)
-                                                userInput=readLine()!
-                                            }while userInput != ""
-                                            userInfo["userMoney"]! += enemyPrize
-                                        }
-                                        if userInfo["userHP"]! == 0 {
-                                            userInfo["userHP"]! = 100
-                                            userInfo["userMP"]! = 50
-                                        }
-                                    }
-                                }else if userInput == "3"{
-                                    repeat{
-                                        print(checkMP(MagicorShield: "s",userMP: userInfo["userMP"]!, userName: userName))
-                                        userInput=readLine()!
-                                    }while userInput != ""
-                                    if userInfo["userMP"]! > 10 {
-                                        userInfo["userMP"]! -= 10
-                                    }
-                                }else if userInput == "4"{
-                                    var isLoop3:Bool = false
-                                    repeat{
-                                        player.playerStatus()
-                                        player.listItem()
-                                        userInput=readLine()!
-                                        if userInput == "1" {
-                                            var isLoop4:Bool = false
-                                            repeat{
-                                                print(checkPotion(userHP: userInfo["userHP"]!, userPotion: userInfo["userPotion"]!))
-                                                userInput=readLine()!
-                                                if userInfo["userPotion"]! == 0{
-                                                    if userInput == ""{
-                                                        isLoop4.toggle()
-                                                    }
-                                                }else if userInfo["userPotion"]! > 0{
-                                                    if userInput.lowercased() == "y" {
-                                                        userInfo["userPotion"]! -= 1
-                                                        userInfo["userHP"]! += 20
-                                                        if userInfo["userHP"]! > 100{
-                                                            userInfo["userHP"]! = 100
-                                                        }
-                                                    }else if userInput.lowercased() == "n"{
-                                                        isLoop4.toggle()
-                                                    }else{
-                                                        repeat{
-                                                            wrongInput()
-                                                            userInput=readLine()!
-                                                        }while userInput != ""
-                                                    }
-                                                }
-                                            }while isLoop4 == false
-                                        }else if userInput == "2"{
-                                            var isLoop4:Bool = false
-                                            repeat{
-                                                print(checkElixir(userMP: userInfo["userMP"]!, userElixir: userInfo["userElixir"]!))
-                                                userInput=readLine()!
-                                                if userInfo["userElixir"]! == 0{
-                                                    if userInput == ""{
-                                                        isLoop4.toggle()
-                                                    }
-                                                }else if userInfo["userElixir"]! > 0{
-                                                    if userInput.lowercased() == "y" {
-                                                        userInfo["userElixir"]! -= 1
-                                                        userInfo["userMP"]! += 20
-                                                        if userInfo["userMP"]! > 50{
-                                                            userInfo["userMP"]! = 50
-                                                        }
-                                                    }else if userInput.lowercased() == "n"{
-                                                        isLoop4.toggle()
-                                                    }else{
-                                                        repeat{
-                                                            wrongInput()
-                                                            userInput=readLine()!
-                                                        }while userInput != ""
-                                                    }
-                                                }
-                                            }while isLoop4 == false
-                                        }else if userInput == "3"{
-                                            isLoop3.toggle()
-                                        }else{
-                                            repeat{
-                                                wrongInput()
-                                                userInput=readLine()!
-                                            }while userInput != ""
-                                        }
-                                    }while isLoop3 == false
-                                }else if userInput == "5"{
-                                    repeat{
-                                        run.run()
-                                        userInput=readLine()!
-                                        if userInput == ""{
-                                            isLoop2.toggle()
-                                        }
-                                    }while userInput != ""
-                                }else{
-                                    repeat{
-                                        wrongInput()
-                                        userInput=readLine()!
-                                    }while userInput != ""
-                                }
-                            }while isLoop2 == false
-                        }
                         else if userInput.lowercased() == "q"{
                             exit(0)
                         }
@@ -887,18 +633,18 @@ repeat {
                                 """)
                                 userInput=readLine()!
                                 if userInput.lowercased() == "p"{
-                                    if userInfo["userMoney"]! >= 5{
-                                        userInfo["userPotion"]! += 1
-                                        userInfo["userMoney"]! -= 5
+                                    if player.money >= 5{
+                                        userPotion.quantity += 1
+                                        player.money -= 5
                                         print("Thanks for your purchase!")
                                     }else{
                                         print("You don't have enough money to buy potion")
                                     }
                                 }
                                 else if userInput.lowercased() == "e"{
-                                    if userInfo["userMoney"]! >= 5{
-                                        userInfo["userElixir"]! += 1
-                                        userInfo["userMoney"]! -= 5
+                                    if player.money >= 5{
+                                        userElixir.quantity += 1
+                                        player.money -= 5
                                         print("Thanks for your purchase!")
                                     }else{
                                         print("You don't have enough money to buy elixir")
