@@ -31,13 +31,15 @@ class elixir: playerItem{
         return (quantity, playerMP)
     }
     func buyElixir(money: Int)->Int{
-        if money > 5{
+        var moneyLeft = 0
+        if money >= 5{
             self.quantity += 1
-            self.money -= 5
+            moneyLeft = money - 5
+            print("Thanks for your purchase!")
         }else{
             print("You don't have enough money to buy Elixir")
         }
-        return quantity
+        return moneyLeft
     }
     //    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
     //        super.init(itemName, description, quantity, money)
@@ -76,14 +78,15 @@ class potion: playerItem{
         return quantity
     }
     func buyPotion(money: Int)->Int{
-        if money > 5{
+        var moneyLeft = 0
+        if money >= 5{
             self.quantity += 1
-            self.money -= 5
-            
+            moneyLeft = money - 5
+            print("Thanks for your purchase!")
         }else{
             print("You don't have enough money to buy \(itemName)")
         }
-        return quantity
+        return moneyLeft
     }
     //Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
     func checkPotion(userHP: Int, userPotion:Int)->String{
@@ -129,6 +132,7 @@ class playerSkill{
             if playerMp <= 0{
                 move = 0
                 print ("""
+                    ============= Player Turn =============
                     You ran out of Mana, can't use \(skillName)
                     Use Elixir to restore Mana
                     
@@ -138,6 +142,7 @@ class playerSkill{
             }else if playerMp < mp{
                 move = 0
                 print  ("""
+            ============= Player Turn =============
             Your current mana : \(playerMp)
             Your Mana doesn't enough to cast \(skillName)
             Use Elixir to restore Mana
@@ -149,7 +154,9 @@ class playerSkill{
             }
         }
         if skillName == "Shield"{
+            move = 0
             print("""
+            ============= Player Turn =============
             \(playerName) use \(mp)pt Mana to use \(skillName) against \(enemy)
             It blocks an upcoming attack
             
@@ -157,6 +164,7 @@ class playerSkill{
             """)
         }else{
             print("""
+        ============= Player Turn =============
         \(playerName) use \(skillName) to \(enemy)
         It deals \(playerDamage)pt to \(enemy)
         """)
@@ -202,6 +210,7 @@ class enemy{
     
     func attack(playerHP: Int)->Int{
         print("""
+    ============= Enemy Turn =============
     \(name) deal \(damage)pt to player
     
     Press [return] to continue:
@@ -209,13 +218,10 @@ class enemy{
         let hpLeft = playerHP - damage
         return hpLeft
     }
-    func getAttacked(hpLeft: Int){
-        self.hp = hpLeft
-    }
-    func killed()->Int {
-        print("")
-        return prize
-    }
+//    func killed()->Int {
+//        print("")
+//        return prize
+//    }
 }
 
 class player{
@@ -381,9 +387,9 @@ repeat {
                      Money: \(player.money)$
                      
                      Action:
-                     - \(physicalAttack.name). \(physicalAttack.description).
-                     - \(meteor.name). \(meteor.description).
-                     - \(shield.name). \(shield.description).
+                     - \(physicalAttack.description).
+                     - \(meteor.description).
+                     - \(shield.description).
                      
                      Items:
                      - \(userPotion.itemName) x\(userPotion.quantity). \(userPotion.description)
@@ -488,7 +494,6 @@ repeat {
                             repeat{
                                 player.playerStatus()
                                 print(enemyType.description)
-                                //                                Cek
                                 player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1" || userInput == "2" || userInput == "3"{
@@ -503,9 +508,10 @@ repeat {
                                     repeat{
                                         let hasil = choosenAction.attack(skillName: choosenAction.name, playerName: player.name, playerMp: player.mp, playerDamage: choosenAction.damage, enemy: enemyType.name, enemyHP: enemyType.hp)
                                         player.mp = hasil.mpLeft
-                                        enemyType.getAttacked(hpLeft: hasil.hpLeft)
+                                        enemyType.hp = hasil.hpLeft
                                         if hasil.move == 1{
-                                            player.hp -= enemyType.damage
+                                            let playerHPLeft = enemyType.attack(playerHP: player.hp)
+                                            player.hp = playerHPLeft
                                         }
                                         userInput=readLine()!
                                     }while userInput != ""
@@ -539,7 +545,7 @@ repeat {
                                         player.listItem()
                                         
                                         userInput=readLine()!
-                                        if userInput == "1" {
+                                        if userInput == "1" || userInput == "2" {
                                             var isLoop4:Bool = false
                                             repeat{
                                                 print(userPotion.checkPotion(userHP: player.hp, userPotion: userPotion.quantity))
@@ -632,23 +638,14 @@ repeat {
                                 
                                 """)
                                 userInput=readLine()!
-                                if userInput.lowercased() == "p"{
-                                    if player.money >= 5{
-                                        userPotion.quantity += 1
-                                        player.money -= 5
-                                        print("Thanks for your purchase!")
-                                    }else{
-                                        print("You don't have enough money to buy potion")
+                                if userInput.lowercased() == "p" || userInput.lowercased() == "e"{
+                                    var moneyLeft : Int = 0
+                                    if userInput.lowercased() == "p"{
+                                        moneyLeft = userPotion.buyPotion(money: player.money)
+                                    }else if userInput.lowercased() == "e"{
+                                        moneyLeft = userElixir.buyElixir(money: player.money)
                                     }
-                                }
-                                else if userInput.lowercased() == "e"{
-                                    if player.money >= 5{
-                                        userElixir.quantity += 1
-                                        player.money -= 5
-                                        print("Thanks for your purchase!")
-                                    }else{
-                                        print("You don't have enough money to buy elixir")
-                                    }
+                                    player.money = moneyLeft
                                 }
                                 else if userInput.lowercased() == "l"{
                                     print("Come again soon")
