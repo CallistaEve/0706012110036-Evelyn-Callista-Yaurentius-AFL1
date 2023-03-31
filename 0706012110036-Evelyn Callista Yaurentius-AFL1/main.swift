@@ -11,25 +11,35 @@ class playerItem {
     var itemName: String=""
     var description: String = ""
     var quantity: Int = 0
-    var money: Int = 0
     
-    init(_ itemName:String, _ description:String ,_ quantity:Int,_ money:Int){
+    init(_ itemName:String, _ description:String ,_ quantity:Int){
         self.itemName = itemName
         self.description = description
         self.quantity = quantity
-        self.money = money
-    }
+}
+//    func usePotion(userHP: Int, userPotion:Int)->String{
+//        var text: String = ""
+//        if userPotion == 0{
+//            text="""
+//            You don't have any potion left. Be careful of your next journey.
+//            Press [return] to go back
+//            """
+//        }
+//        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
+//        else{
+//            text="""
+//             Your HP is \(userHP).
+//             You have \(userPotion) potions.
+//
+//             Are you sure want to use 1 potion to heal wound? [Y/N]
+//             """
+//        }
+//        return text
+//    }
 }
 
 class elixir: playerItem{
-    var mp:Int = 0
-    
-    func useElixir(playerName: String, playerMP: Int)->(quantity: Int, playerMP: Int){
-        let playerMP = playerMP+20
-        self.quantity -= 1
-        print("\(playerName) use Elixir, Elixir left \(quantity)")
-        return (quantity, playerMP)
-    }
+
     func buyElixir(money: Int)->Int{
         var moneyLeft = 0
         if money >= 5{
@@ -41,11 +51,9 @@ class elixir: playerItem{
         }
         return moneyLeft
     }
-    //    init(_ itemName: String, _ description: String,_ quantity:Int,_ money: Int, _ mp: Int){
-    //        super.init(itemName, description, quantity, money)
-    //    }
+
     //Function untuk menghasilkan output berupa teks berdasarkan jumlah elixir yang dimiliki pengguna
-    func checkElixir(userMP: Int, userElixir:Int)->String{
+    func useElixir(userMP: Int, userElixir:Int)->String{
         var text: String = ""
         if userElixir == 0{
             text="""
@@ -54,7 +62,6 @@ class elixir: playerItem{
             Press [return] to go back
             """
         }
-        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan elixir
         else{
             text="""
              Your MP is \(userMP).
@@ -69,14 +76,7 @@ class elixir: playerItem{
 }
 
 class potion: playerItem{
-    var hp:Int = 0
     
-    func usePotion(playerName:String, playerHP:Int)->Int{
-        self.hp = hp+20
-        self.quantity -= 1
-        print("\(playerName) use \(itemName), \(itemName) left \(quantity)")
-        return quantity
-    }
     func buyPotion(money: Int)->Int{
         var moneyLeft = 0
         if money >= 5{
@@ -89,7 +89,7 @@ class potion: playerItem{
         return moneyLeft
     }
     //Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
-    func checkPotion(userHP: Int, userPotion:Int)->String{
+    func usePotion(userHP: Int, userPotion:Int)->String{
         var text: String = ""
         if userPotion == 0{
             text="""
@@ -102,7 +102,7 @@ class potion: playerItem{
             text="""
              Your HP is \(userHP).
              You have \(userPotion) potions.
-             
+
              Are you sure want to use 1 potion to heal wound? [Y/N]
              """
         }
@@ -218,10 +218,6 @@ class enemy{
         let hpLeft = playerHP - damage
         return hpLeft
     }
-//    func killed()->Int {
-//        print("")
-//        return prize
-//    }
 }
 
 class player{
@@ -229,14 +225,16 @@ class player{
     var hp: Int = 0
     var mp: Int = 0
     var money: Int = 0
-    var playerItem : [playerItem] = []
-    var playerSkill : [playerSkill] = []
+    var playerItem : [playerItem] = [userPotion, userElixir]
+    var playerSkill : [playerSkill] = [meteor, physicalAttack, run, shield]
     
     init(_ name:String){
         self.name = name
         hp = 100
         mp = 50
         money = 0
+        playerItem = [userPotion, userElixir]
+        playerSkill = [physicalAttack, meteor, shield, run]
     }
     func playerStatus(){
         print("""
@@ -252,8 +250,8 @@ class player{
         print("""
         
         Your items:
-        [1].Potion = \(userPotion.quantity)
-        [2].Elixir = \(userElixir.quantity)
+        [1].Potion = \(self.playerItem[0].quantity)
+        [2].Elixir = \(self.playerItem[0].quantity)
         [3].Close the bag
                                                                                         
         Which item do you want to use?
@@ -272,12 +270,41 @@ class player{
             Your choice?
         """)
     }
+    //Function untuk menghasilkan teks ketika user memilih opsi yang tidak tersedia
+    func wrongInput(){
+        print("""
+    Please Enter The Correct Input
+
+    Press [return] to continue:
+    """)
+    }
+    
+    func checkWinLose(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String{
+        var text: String = ""
+        if enemyHP <= 0{
+            text = """
+        Congratulations!! You just defeat the \(enemyName)
+
+        Press [return] to continue:
+    """
+        }else if userHP <= 0{
+            text = """
+        Game Over!!
+        \(userName) ran out of HP!!
+        You flee from the battle and went to the hospitals
+        \(userName) HP and MP restored
+
+        Press [return] to continue:
+    """
+        }
+        return text
+    }
 }
 
 
 //Inisialisasi Monster dan Item
-let userPotion = potion("Potion", "Restore 50pt of HP", 20, 0)
-let userElixir = elixir("Elixir", "Restore 20pt of MP", 20, 0)
+let userPotion = potion("Potion", "Restore 50pt of HP", 20)
+let userElixir = elixir("Elixir", "Restore 20pt of MP", 20)
 
 let run = playerSkill("Run", 0, 0, "Flee from battle.")
 let physicalAttack = playerSkill("Physical Attack", 0, 5, "Physical Attack. No mana required. Deal 5pt of damage.")
@@ -295,35 +322,9 @@ let set = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNO
 var nameCheck:Bool = false
 
 //Function untuk menghasilkan text berdasarkan jumlah Health Point(HP) yang dimiliki pengguna untuk menghasilkan output hasil battle
-func checkHP(enemyName:String, userName:String, userHP:Int, enemyHP:Int)->String{
-    var text: String = ""
-    if enemyHP <= 0{
-        text = """
-    Congratulations!! You just defeat the \(enemyName)
 
-    Press [return] to continue:
-"""
-    }else if userHP <= 0{
-        text = """
-    Game Over!!
-    \(userName) ran out of HP!!
-    You flee from the battle and went to the hospitals
-    \(userName) HP and MP restored
 
-    Press [return] to continue:
-"""
-    }
-    return text
-}
 
-//Function untuk menghasilkan teks ketika user memilih opsi yang tidak tersedia
-func wrongInput(){
-    print("""
-Please Enter The Correct Input
-
-Press [return] to continue:
-""")
-}
 
 repeat {
     //Variabel yang menyimpan data pengguna
@@ -417,7 +418,8 @@ repeat {
                                     //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
-                                        print(userPotion.checkPotion(userHP: player.hp, userPotion: userPotion.quantity))
+//                                        print(player.playerItem[0].usePotion(userHP: player.hp, userPotion: player.playerItem[0].quantity))
+                                        print(userPotion.usePotion(userHP: player.hp, userPotion: userPotion.quantity))
                                         userInput=readLine()!
                                         if userPotion.quantity == 0{
                                             if userInput == ""{
@@ -434,7 +436,7 @@ repeat {
                                                 isLoop4.toggle()
                                             }else{
                                                 repeat{
-                                                    wrongInput()
+                                                    player.wrongInput()
                                                     userInput=readLine()!
                                                 }while userInput != ""
                                             }
@@ -444,7 +446,7 @@ repeat {
                                     //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
-                                        print(userElixir.checkElixir(userMP: player.mp, userElixir: userElixir.quantity))
+                                        print(userElixir.useElixir(userMP: player.mp, userElixir: userElixir.quantity))
                                         userInput=readLine()!
                                         if userElixir.quantity == 0{
                                             if userInput == ""{
@@ -461,7 +463,7 @@ repeat {
                                                 isLoop4.toggle()
                                             }else{
                                                 repeat{
-                                                    wrongInput()
+                                                    player.wrongInput()
                                                     userInput=readLine()!
                                                 }while userInput != ""
                                             }
@@ -471,7 +473,7 @@ repeat {
                                     isLoop3.toggle()
                                 }else{
                                     repeat{
-                                        wrongInput()
+                                        player.wrongInput()
                                         userInput=readLine()!
                                     }while userInput != ""
                                 }
@@ -499,11 +501,11 @@ repeat {
                                 if userInput == "1" || userInput == "2" || userInput == "3"{
                                     var choosenAction = physicalAttack
                                     if userInput.lowercased() == "1"{
-                                        choosenAction = physicalAttack
+                                        choosenAction = player.playerSkill[0]
                                     }else if userInput.lowercased() == "2"{
-                                        choosenAction = meteor
+                                        choosenAction = player.playerSkill[1]
                                     }else if userInput.lowercased() == "3"{
-                                        choosenAction = shield
+                                        choosenAction = player.playerSkill[2]
                                     }
                                     repeat{
                                         let hasil = choosenAction.attack(skillName: choosenAction.name, playerName: player.name, playerMp: player.mp, playerDamage: choosenAction.damage, enemy: enemyType.name, enemyHP: enemyType.hp)
@@ -517,7 +519,7 @@ repeat {
                                     }while userInput != ""
                                     if enemyType.hp <= 0 || player.hp <= 0{
                                         repeat{
-                                            print(checkHP(enemyName:enemyType.name,userName: player.name, userHP: player.hp, enemyHP: enemyType.hp))
+                                            print(player.checkWinLose(enemyName:enemyType.name,userName: player.name, userHP: player.hp, enemyHP: enemyType.hp))
                                             userInput=readLine()!
                                         }while userInput != ""
                                         isLoop2.toggle()
@@ -548,7 +550,7 @@ repeat {
                                         if userInput == "1" || userInput == "2" {
                                             var isLoop4:Bool = false
                                             repeat{
-                                                print(userPotion.checkPotion(userHP: player.hp, userPotion: userPotion.quantity))
+                                                print(userPotion.usePotion(userHP: player.hp, userPotion: userPotion.quantity))
                                                 userInput=readLine()!
                                                 if userPotion.quantity == 0{
                                                     if userInput == ""{
@@ -565,7 +567,7 @@ repeat {
                                                         isLoop4.toggle()
                                                     }else{
                                                         repeat{
-                                                            wrongInput()
+                                                            player.wrongInput()
                                                             userInput=readLine()!
                                                         }while userInput != ""
                                                     }
@@ -574,7 +576,7 @@ repeat {
                                         }else if userInput == "2"{
                                             var isLoop4:Bool = false
                                             repeat{
-                                                print(userElixir.checkElixir(userMP: player.mp, userElixir: userElixir.quantity))
+                                                print(userElixir.useElixir(userMP: player.mp, userElixir: userElixir.quantity))
                                                 userInput=readLine()!
                                                 if userElixir.quantity == 0{
                                                     if userInput == ""{
@@ -591,7 +593,7 @@ repeat {
                                                         isLoop4.toggle()
                                                     }else{
                                                         repeat{
-                                                            wrongInput()
+                                                            player.wrongInput()
                                                             userInput=readLine()!
                                                         }while userInput != ""
                                                     }
@@ -601,7 +603,7 @@ repeat {
                                             isLoop3.toggle()
                                         }else{
                                             repeat{
-                                                wrongInput()
+                                                player.wrongInput()
                                                 userInput=readLine()!
                                             }while userInput != ""
                                         }
@@ -616,7 +618,7 @@ repeat {
                                     }while userInput != ""
                                 }else{
                                     repeat{
-                                        wrongInput()
+                                        player.wrongInput()
                                         userInput=readLine()!
                                     }while userInput != ""
                                 }
@@ -652,14 +654,14 @@ repeat {
                                     isLoop2.toggle()
                                 }else{
                                     repeat{
-                                        wrongInput()
+                                        player.wrongInput()
                                         userInput=readLine()!
                                     }while userInput != ""
                                 }
                             }while isLoop2 == false
                         }else{
                             repeat{
-                                wrongInput()
+                                player.wrongInput()
                                 userInput=readLine()!
                             }while userInput != ""
                         }
