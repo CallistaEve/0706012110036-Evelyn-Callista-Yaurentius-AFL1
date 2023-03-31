@@ -225,15 +225,13 @@ class player{
     var hp: Int = 0
     var mp: Int = 0
     var money: Int = 0
-    var playerItem : [playerItem] = [userPotion, userElixir]
-    var playerSkill : [playerSkill] = [meteor, physicalAttack, run, shield]
+    var playerSkill : [playerSkill] = [physicalAttack, meteor, shield]
     
     init(_ name:String){
         self.name = name
         hp = 100
         mp = 50
         money = 0
-        playerItem = [userPotion, userElixir]
         playerSkill = [physicalAttack, meteor, shield, run]
     }
     func playerStatus(){
@@ -250,8 +248,8 @@ class player{
         print("""
         
         Your items:
-        [1].Potion = \(self.playerItem[0].quantity)
-        [2].Elixir = \(self.playerItem[0].quantity)
+        [1].Potion = \(userPotion.quantity)
+        [2].Elixir = \(userElixir.quantity)
         [3].Close the bag
                                                                                         
         Which item do you want to use?
@@ -320,11 +318,6 @@ var isLoop1:Bool = false
 //Error handling agar nama tidak menyimpan special input
 let set = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNOPQRSTUVWXYZ ")
 var nameCheck:Bool = false
-
-//Function untuk menghasilkan text berdasarkan jumlah Health Point(HP) yang dimiliki pengguna untuk menghasilkan output hasil battle
-
-
-
 
 repeat {
     //Variabel yang menyimpan data pengguna
@@ -545,9 +538,8 @@ repeat {
                                     repeat{
                                         player.playerStatus()
                                         player.listItem()
-                                        
                                         userInput=readLine()!
-                                        if userInput == "1" || userInput == "2" {
+                                        if userInput == "1"{
                                             var isLoop4:Bool = false
                                             repeat{
                                                 print(userPotion.usePotion(userHP: player.hp, userPotion: userPotion.quantity))
