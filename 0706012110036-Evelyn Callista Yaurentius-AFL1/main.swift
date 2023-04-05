@@ -7,7 +7,16 @@
 
 import Foundation
 
-class playerItem {
+//Kumpulan Protocols
+protocol belanja{
+    func buy(money: Int, itemName: String)->Int
+}
+protocol defaultAttack{
+    func defaultAttack(hp: Int)->Int
+}
+
+//Kumpulan Class
+class playerItem: belanja {
     var itemName: String=""
     var description: String = ""
     var quantity: Int = 0
@@ -16,42 +25,22 @@ class playerItem {
         self.itemName = itemName
         self.description = description
         self.quantity = quantity
-}
-//    func usePotion(userHP: Int, userPotion:Int)->String{
-//        var text: String = ""
-//        if userPotion == 0{
-//            text="""
-//            You don't have any potion left. Be careful of your next journey.
-//            Press [return] to go back
-//            """
-//        }
-//        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
-//        else{
-//            text="""
-//             Your HP is \(userHP).
-//             You have \(userPotion) potions.
-//
-//             Are you sure want to use 1 potion to heal wound? [Y/N]
-//             """
-//        }
-//        return text
-//    }
-}
-
-class elixir: playerItem{
-
-    func buyElixir(money: Int)->Int{
+    }
+    
+    func buy(money: Int, itemName:String)->Int{
         var moneyLeft = 0
         if money >= 5{
             self.quantity += 1
             moneyLeft = money - 5
             print("Thanks for your purchase!")
         }else{
-            print("You don't have enough money to buy Elixir")
+            print("You don't have enough money to buy \(itemName)")
         }
         return moneyLeft
     }
+}
 
+class elixir: playerItem{
     //Function untuk menghasilkan output berupa teks berdasarkan jumlah elixir yang dimiliki pengguna
     func useElixir(userMP: Int, userElixir:Int)->String{
         var text: String = ""
@@ -62,6 +51,7 @@ class elixir: playerItem{
             Press [return] to go back
             """
         }
+        // If atau Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
         else{
             text="""
              Your MP is \(userMP).
@@ -76,18 +66,6 @@ class elixir: playerItem{
 }
 
 class potion: playerItem{
-    
-    func buyPotion(money: Int)->Int{
-        var moneyLeft = 0
-        if money >= 5{
-            self.quantity += 1
-            moneyLeft = money - 5
-            print("Thanks for your purchase!")
-        }else{
-            print("You don't have enough money to buy \(itemName)")
-        }
-        return moneyLeft
-    }
     //Function untuk menghasilkan output berupa teks berdasarkan jumlah potion yang dimiliki pengguna
     func usePotion(userHP: Int, userPotion:Int)->String{
         var text: String = ""
@@ -97,7 +75,7 @@ class potion: playerItem{
             Press [return] to go back
             """
         }
-        // If/Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
+        // If atau Else untuk menghasilkan output berupa teks untuk konfirmasi penggunaan potion
         else{
             text="""
              Your HP is \(userHP).
@@ -111,17 +89,27 @@ class potion: playerItem{
     
 }
 
-class playerSkill{
-    var name: String=""
-    var description: String=""
-    var mp: Int=0
-    var damage: Int=0
+struct playerSkill: defaultAttack{
+    var name: String
+    var description: String
+    var mp: Int
+    var damage: Int
     
     init(_ name:String, _ mp:Int ,_ damage:Int,_ description:String){
         self.name = name
         self.mp = mp
         self.damage = damage
         self.description = description
+    }
+    
+    func defaultAttack(hp: Int)->Int{
+        print("""
+    ============= Player Turn =============
+    Player deal \(damage)pt to player
+    
+    """)
+        let hpLeft = hp - damage
+        return hpLeft
     }
     
     func attack(skillName: String, playerName: String, playerMp: Int, playerDamage: Int, enemy: String, enemyHP: Int)->(hpLeft: Int, mpLeft: Int, move: Int){
@@ -131,24 +119,24 @@ class playerSkill{
         if skillName == "Meteor" || skillName == "Shield"{
             if playerMp <= 0{
                 move = 0
-                print ("""
-                    ============= Player Turn =============
-                    You ran out of Mana, can't use \(skillName)
-                    Use Elixir to restore Mana
+    print ("""
+        ============= Player Turn =============
+        You ran out of Mana, can't use \(skillName)
+        Use Elixir to restore Mana
                     
-                    Press [return] to go back:
+        Press [return] to go back:
         """)
                 return (hpLeft, mpLeft, move)
             }else if playerMp < mp{
                 move = 0
-                print  ("""
-            ============= Player Turn =============
-            Your current mana : \(playerMp)
-            Your Mana doesn't enough to cast \(skillName)
-            Use Elixir to restore Mana
+            print  ("""
+        ============= Player Turn =============
+        Your current mana : \(playerMp)
+        Your Mana doesn't enough to cast \(skillName)
+        Use Elixir to restore Mana
             
-            Press [return] to go back:
-            """
+        Press [return] to go back:
+        """
                         )
                 return (hpLeft, mpLeft, move)
             }
@@ -163,11 +151,11 @@ class playerSkill{
             Press [return] to continue:
             """)
         }else{
-            print("""
-        ============= Player Turn =============
-        \(playerName) use \(skillName) to \(enemy)
-        It deals \(playerDamage)pt to \(enemy)
-        """)
+        print("""
+    ============= Player Turn =============
+    \(playerName) use \(skillName) to \(enemy)
+    It deals \(playerDamage)pt to \(enemy)
+    """)
         }
         hpLeft = enemyHP - playerDamage
         mpLeft = playerMp - mp
@@ -186,12 +174,13 @@ class playerSkill{
     
 }
 
-class enemy{
-    var name: String = ""
-    var hp: Int = 0
-    var damage: Int = 0
-    var prize: Int = 0
-    var encounterText: String = ""
+//Kumpulan Struct
+struct enemy: defaultAttack{
+    var name: String
+    var hp: Int
+    var damage: Int
+    var prize: Int
+    var encounterText: String
     var description: String{
         return """
                 Name: \(name) x1
@@ -208,31 +197,30 @@ class enemy{
         self.encounterText = encounterText
     }
     
-    func attack(playerHP: Int)->Int{
+    func defaultAttack(hp: Int)->Int{
         print("""
     ============= Enemy Turn =============
     \(name) deal \(damage)pt to player
     
     Press [return] to continue:
     """)
-        let hpLeft = playerHP - damage
+        let hpLeft = hp - damage
         return hpLeft
     }
 }
 
-class player{
-    var name: String = ""
-    var hp: Int = 0
-    var mp: Int = 0
-    var money: Int = 0
-    var playerSkill : [playerSkill] = [physicalAttack, meteor, shield]
+struct player{
+    var name: String
+    var hp: Int
+    var mp: Int
+    var money: Int
+    var playerSkill : [playerSkill] = [physicalAttack, meteor, shield, run]
     
     init(_ name:String){
         self.name = name
         hp = 100
         mp = 50
         money = 0
-        playerSkill = [physicalAttack, meteor, shield, run]
     }
     func playerStatus(){
         print("""
@@ -281,18 +269,18 @@ class player{
         var text: String = ""
         if enemyHP <= 0{
             text = """
-        Congratulations!! You just defeat the \(enemyName)
+    Congratulations!! You just defeat the \(enemyName)
 
-        Press [return] to continue:
+    Press [return] to continue:
     """
         }else if userHP <= 0{
             text = """
-        Game Over!!
-        \(userName) ran out of HP!!
-        You flee from the battle and went to the hospitals
-        \(userName) HP and MP restored
+    Game Over!!
+    \(userName) ran out of HP!!
+    You flee from the battle and went to the hospitals
+    \(userName) HP and MP restored
 
-        Press [return] to continue:
+    Press [return] to continue:
     """
         }
         return text
@@ -300,11 +288,10 @@ class player{
 }
 
 
-//Inisialisasi Monster dan Item
+//Inisialisasi PlayerSKill dan Item
 let userPotion = potion("Potion", "Restore 50pt of HP", 20)
 let userElixir = elixir("Elixir", "Restore 20pt of MP", 20)
-
-let run = playerSkill("Run", 0, 0, "Flee from battle.")
+let run = playerSkill("Run", 0, 0, "Run. Flee from battle.")
 let physicalAttack = playerSkill("Physical Attack", 0, 5, "Physical Attack. No mana required. Deal 5pt of damage.")
 let meteor = playerSkill("Meteor", 15, 50, "Meteor. Use 15pt of MP. Deal 50pt of damage.")
 let shield = playerSkill("Shield", 10, 0, "Shield. Use 10pt of MP. Block enemy's attack in 1 turn.")
@@ -345,7 +332,7 @@ repeat {
                     print("Must not included number or special character")
                     
                 } else {
-                    let player = player(userName)
+                    var player = player(userName)
                     print("\nNice to meet you \(player.name)!")
                     
                     repeat {
@@ -381,12 +368,13 @@ repeat {
                      Money: \(player.money)$
                      
                      Action:
-                     - \(physicalAttack.description).
-                     - \(meteor.description).
-                     - \(shield.description).
+                     - \(physicalAttack.description)
+                     - \(meteor.description)
+                     - \(shield.description)
+                     - \(run.description)
                      
                      Items:
-                     - \(userPotion.itemName) x\(userPotion.quantity). \(userPotion.description)
+                     - \(userPotion.itemName) x\(userPotion.quantity). \(userPotion.description).
                      - \(userElixir.itemName) x\(userElixir.quantity). \(userElixir.description).
                      
                      Press [return] to go back:
@@ -404,6 +392,7 @@ repeat {
                             //Boolean untuk looping program menu ketiga
                             var isLoop3:Bool = false
                             repeat{
+                                print("============= Player Status =============")
                                 player.playerStatus()
                                 player.listItem()
                                 userInput=readLine()!
@@ -411,7 +400,6 @@ repeat {
                                     //Boolean untuk looping program menu keempat
                                     var isLoop4:Bool = false
                                     repeat{
-//                                        print(player.playerItem[0].usePotion(userHP: player.hp, userPotion: player.playerItem[0].quantity))
                                         print(userPotion.usePotion(userHP: player.hp, userPotion: userPotion.quantity))
                                         userInput=readLine()!
                                         if userPotion.quantity == 0{
@@ -492,24 +480,34 @@ repeat {
                                 player.listAction()
                                 userInput=readLine()!
                                 if userInput == "1" || userInput == "2" || userInput == "3"{
-                                    var choosenAction = physicalAttack
-                                    if userInput.lowercased() == "1"{
-                                        choosenAction = player.playerSkill[0]
-                                    }else if userInput.lowercased() == "2"{
-                                        choosenAction = player.playerSkill[1]
-                                    }else if userInput.lowercased() == "3"{
-                                        choosenAction = player.playerSkill[2]
-                                    }
-                                    repeat{
-                                        let hasil = choosenAction.attack(skillName: choosenAction.name, playerName: player.name, playerMp: player.mp, playerDamage: choosenAction.damage, enemy: enemyType.name, enemyHP: enemyType.hp)
-                                        player.mp = hasil.mpLeft
-                                        enemyType.hp = hasil.hpLeft
-                                        if hasil.move == 1{
-                                            let playerHPLeft = enemyType.attack(playerHP: player.hp)
+                                    var choosenAction = player.playerSkill[0]
+                                    if userInput == "1"{
+                                        repeat{
+                                            let enemyHPLeft = choosenAction.defaultAttack(hp: enemyType.hp)
+                                            enemyType.hp = enemyHPLeft
+                                            let playerHPLeft = enemyType.defaultAttack(hp: player.hp)
                                             player.hp = playerHPLeft
+                                            userInput=readLine()!
+                                        }while userInput != ""
+                                    }
+                                    else if userInput == "2" || userInput == "3"{
+                                        if userInput.lowercased() == "2"{
+                                            choosenAction = player.playerSkill[1]
+                                        }else if userInput.lowercased() == "3"{
+                                            choosenAction = player.playerSkill[2]
                                         }
-                                        userInput=readLine()!
-                                    }while userInput != ""
+                                        repeat{
+                                            let hasil = choosenAction.attack(skillName: choosenAction.name, playerName: player.name, playerMp: player.mp, playerDamage: choosenAction.damage, enemy: enemyType.name, enemyHP: enemyType.hp)
+                                            player.mp = hasil.mpLeft
+                                            enemyType.hp = hasil.hpLeft
+                                            if hasil.move == 1{
+                                                let playerHPLeft = enemyType.defaultAttack(hp: player.hp)
+                                                player.hp = playerHPLeft
+                                            }
+                                            userInput=readLine()!
+                                        }while userInput != ""
+                                        
+                                    }
                                     if enemyType.hp <= 0 || player.hp <= 0{
                                         repeat{
                                             print(player.checkWinLose(enemyName:enemyType.name,userName: player.name, userHP: player.hp, enemyHP: enemyType.hp))
@@ -518,10 +516,10 @@ repeat {
                                         isLoop2.toggle()
                                         if enemyType.hp <= 0{
                                             repeat{
-                                                print("""
+                                            print("""
                                         You defeat the \(enemyType.name), villagers pays \(enemyType.prize)$ for your service
                                         
-                                              Press [return] to continue:
+                                        Press [return] to continue:
                                         """)
                                                 userInput=readLine()!
                                             }while userInput != ""
@@ -533,9 +531,11 @@ repeat {
                                         }
                                     }
                                 }
+                                
                                 else if userInput == "4"{
                                     var isLoop3:Bool = false
                                     repeat{
+                                        print("============= Player Status =============")
                                         player.playerStatus()
                                         player.listItem()
                                         userInput=readLine()!
@@ -602,7 +602,7 @@ repeat {
                                     }while isLoop3 == false
                                 }else if userInput == "5"{
                                     repeat{
-                                        run.run()
+                                        player.playerSkill[3].run()
                                         userInput=readLine()!
                                         if userInput == ""{
                                             isLoop2.toggle()
@@ -635,9 +635,9 @@ repeat {
                                 if userInput.lowercased() == "p" || userInput.lowercased() == "e"{
                                     var moneyLeft : Int = 0
                                     if userInput.lowercased() == "p"{
-                                        moneyLeft = userPotion.buyPotion(money: player.money)
+                                        moneyLeft = userPotion.buy(money: player.money, itemName: userPotion.itemName)
                                     }else if userInput.lowercased() == "e"{
-                                        moneyLeft = userElixir.buyElixir(money: player.money)
+                                        moneyLeft = userElixir.buy(money: player.money, itemName: userElixir.itemName)
                                     }
                                     player.money = moneyLeft
                                 }
